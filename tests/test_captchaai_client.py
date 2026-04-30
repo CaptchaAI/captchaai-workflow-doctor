@@ -65,6 +65,14 @@ def test_submit_recaptcha_v2_ok(client: CaptchaAIClient) -> None:
 
 
 @respx.mock
+def test_submit_accepts_integer_captcha_id(client: CaptchaAIClient) -> None:
+    """Production CaptchaAI returns captcha_id as an int for userrecaptcha."""
+    respx.post(SUBMIT_URL).respond(json={"status": 1, "request": 3397637370})
+    result = client.submit_recaptcha_v2(sitekey="6Lc...", page_url="https://x.test")
+    assert result.captcha_id == "3397637370"
+
+
+@respx.mock
 def test_get_result_ok(client: CaptchaAIClient) -> None:
     respx.get(RESULT_URL).respond(json={"status": 1, "request": "TOKEN_TOKEN_TOKEN_xyz"})
     result = client.get_result("1234567890")
