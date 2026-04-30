@@ -1,0 +1,46 @@
+name: local-demo-form-recaptcha-v2
+captcha_type: recaptcha_v2
+
+target:
+  url: "http://127.0.0.1:8766/contact"
+  allowed_domains:
+    - "127.0.0.1"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  record_trace: false
+  screenshots: true
+
+captchaai:
+  polling_interval_seconds: 5
+  max_wait_seconds: 180
+
+detection:
+  sitekey_selector: ".g-recaptcha"
+  response_field_selector: "textarea[name='g-recaptcha-response']"
+  callback_candidates:
+    - "onRecaptchaSuccess"
+
+actions:
+  before_solve:
+    - type: fill
+      selector: "input[name='message']"
+      value: "diagnostic test message"
+
+  after_token:
+    - type: inject_token
+      selector: "textarea[name='g-recaptcha-response']"
+    - type: invoke_callback_if_detected
+    - type: click
+      selector: "button[type='submit']"
+
+success:
+  url_contains:
+    - "/thanks"
+
+failure:
+  any_text:
+    - "captcha verification failed"
+    - "please complete the captcha"

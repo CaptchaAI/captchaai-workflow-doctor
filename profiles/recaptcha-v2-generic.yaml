@@ -1,0 +1,47 @@
+# Generic reCAPTCHA v2 profile template.
+#
+# Copy this file, rename it, and adjust:
+#   - target.url and allowed_domains for YOUR authorized test page
+#   - selectors to match the page's reCAPTCHA widget
+#
+# NEVER put API keys, passwords, or tokens directly in this file.
+
+name: recaptcha-v2-generic
+captcha_type: recaptcha_v2
+
+target:
+  url: "https://example.com/contact"
+  allowed_domains:
+    - "example.com"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  screenshots: true
+
+captchaai:
+  polling_interval_seconds: 5
+  max_wait_seconds: 180
+
+detection:
+  sitekey_selector: ".g-recaptcha"
+  response_field_selector: "textarea[name='g-recaptcha-response']"
+  callback_candidates: []
+
+actions:
+  before_solve: []
+  after_token:
+    - type: inject_token
+      selector: "textarea[name='g-recaptcha-response']"
+    - type: invoke_callback_if_detected
+    - type: click
+      selector: "button[type='submit']"
+
+success:
+  url_contains:
+    - "/thanks"
+
+failure:
+  any_text:
+    - "please complete the captcha"
