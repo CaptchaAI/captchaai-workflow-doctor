@@ -51,6 +51,12 @@ RECOMMENDATIONS: dict[str, str] = {
         "Profile uses captcha_type=recaptcha_v3 but detection.action is empty. Set it to the "
         "exact action name the page passes to grecaptcha.execute (e.g. 'login', 'submit')."
     ),
+    "cloudflare_proxy_misconfigured": (
+        "Profile uses captcha_type=cloudflare_challenge but the proxy block is missing or its "
+        "credential env vars are unset. Cloudflare binds the cf_clearance cookie to the IP that "
+        "solved it, so both the CaptchaAI worker and your browser must egress through the same "
+        "proxy. Add a `proxy:` block and export the username/password env vars."
+    ),
     "unknown": "An unexpected error occurred. See `detail` in the report for the raw exception.",
 }
 

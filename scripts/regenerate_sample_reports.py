@@ -192,6 +192,38 @@ SAMPLES: dict[str, RunResult] = {
         captcha_type="turnstile",
         target_url="http://127.0.0.1:8765/login?widget=invisible",
     ),
+    "cloudflare-challenge-success": _base(
+        profile_name="local-demo-cloudflare-challenge",
+        captcha_type="cloudflare_challenge",
+        target_url="http://127.0.0.1:8769/protected",
+        # CF Challenge has no sitekey \u2014 the clearance is a cookie.
+        sitekey_found=None,
+        action_steps=[
+            {
+                "type": "apply_clearance_cookie",
+                "selector": None,
+                "succeeded": True,
+                "detail": None,
+            },
+        ],
+    ),
+    "cloudflare-proxy-misconfigured": _base(
+        profile_name="local-demo-cloudflare-challenge",
+        captcha_type="cloudflare_challenge",
+        target_url="http://127.0.0.1:8769/protected",
+        status="failure",
+        root_cause="cloudflare_proxy_misconfigured",
+        detail=(
+            "cloudflare_challenge proxy credentials missing from environment: "
+            "['DOCTOR_PROXY_USER', 'DOCTOR_PROXY_PASS']"
+        ),
+        sitekey_found=None,
+        captcha_id_redacted=None,
+        poll_attempts=0,
+        poll_seconds=0.0,
+        action_steps=[],
+        screenshots=[],
+    ),
 }
 
 

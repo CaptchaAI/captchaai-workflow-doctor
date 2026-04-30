@@ -32,7 +32,9 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-CaptchaKind = Literal["turnstile", "recaptcha_v2", "recaptcha_v3", "unknown"]
+CaptchaKind = Literal[
+    "turnstile", "recaptcha_v2", "recaptcha_v3", "cloudflare_challenge", "unknown"
+]
 
 # (selector, attribute that holds the sitekey, kind)
 _HEURISTIC_RULES: list[tuple[str, str, CaptchaKind]] = [
@@ -57,6 +59,8 @@ DEFAULT_CALLBACK_CANDIDATES: dict[CaptchaKind, list[str]] = {
     "recaptcha_v2": ["onRecaptchaSuccess", "recaptchaCallback", "onloadRecaptchaCallback"],
     # v3 has no callback in the page; the doctor uses grecaptcha.execute().
     "recaptcha_v3": [],
+    # CF Challenge has no JS callback; the cookie is applied at the context level.
+    "cloudflare_challenge": [],
     "unknown": [],
 }
 
@@ -67,6 +71,8 @@ DEFAULT_RESPONSE_FIELD: dict[CaptchaKind, str] = {
     # v3 stores its token in a hidden input named after the action,
     # but the canonical default field is g-recaptcha-response.
     "recaptcha_v3": "input[name='g-recaptcha-response']",
+    # CF Challenge has no response field — the clearance lives in a cookie.
+    "cloudflare_challenge": "",
     "unknown": "",
 }
 
@@ -153,6 +159,27 @@ def detect_widget(page: Page) -> DetectedWidget | None:
                 selector_matched=_RECAPTCHA_V3_SCRIPT_SELECTOR,
                 sitekey_attribute="src?render=",
             )
+    # Fall back to a Cloudflare interstitial ("Just a moment..."). These
+    # pages have no sitekey — they redirect to a /cdn-cgi/challenge-platform
+    # script. We use ``sitekey=""`` to signal "clearance-cookie style, not
+    # token style".
+    cf_selectors = (
+        "script[src*='challenges.cloudflare.com/cdn-cgi/challenge-platform']",
+        "script[src*='/cdn-cgi/challenge-platform/']",
+        "#challenge-running",
+        "#cf-challenge-running",
+    )
+    for sel in cf_selectors:
+        try:
+            if page.query_selector(sel) is not None:
+                return DetectedWidget(
+                    kind="cloudflare_challenge",
+                    sitekey="",
+                    selector_matched=sel,
+                    sitekey_attribute="",
+                )
+        except Exception:  # pragma: no cover - defensive
+            continue
     return None
 
 

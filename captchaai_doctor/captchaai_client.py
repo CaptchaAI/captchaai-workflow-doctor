@@ -233,6 +233,50 @@ class CaptchaAIClient:
             }
         )
 
+    def submit_cloudflare_challenge(
+        self,
+        *,
+        page_url: str,
+        user_agent: str,
+        proxy_host: str,
+        proxy_port: int,
+        proxy_type: str,
+        proxy_username: str | None = None,
+        proxy_password: str | None = None,
+    ) -> SubmitResult:
+        """Submit a Cloudflare interstitial ("Just a moment...") challenge.
+
+        Unlike the Turnstile/reCAPTCHA flows this does not return a token to
+        inject into a form; it returns a structured ``cf_clearance`` cookie
+        the caller must replay from the **same egress IP** the worker used.
+        That is why ``proxy_host``/``proxy_port``/``proxy_type`` are required
+        — the cookie is bound to the IP that solved it.
+        """
+        if not user_agent.strip():
+            raise ValueError("submit_cloudflare_challenge requires a non-empty user_agent")
+        if not (1 <= proxy_port <= 65535):
+            raise ValueError("proxy_port must be in 1..65535")
+        proxy_type_norm = proxy_type.strip().upper()
+        if proxy_type_norm not in {"HTTP", "HTTPS", "SOCKS4", "SOCKS5"}:
+            raise ValueError(
+                f"proxy_type must be one of HTTP/HTTPS/SOCKS4/SOCKS5, got {proxy_type!r}"
+            )
+        if (proxy_username is None) != (proxy_password is None):
+            raise ValueError("proxy_username and proxy_password must both be set or both omitted")
+        if proxy_username and proxy_password:
+            proxy_value = f"{proxy_username}:{proxy_password}@{proxy_host}:{proxy_port}"
+        else:
+            proxy_value = f"{proxy_host}:{proxy_port}"
+        return self._submit(
+            {
+                "method": "cloudflare_challenge",
+                "pageurl": page_url,
+                "userAgent": user_agent,
+                "proxy": proxy_value,
+                "proxytype": proxy_type_norm,
+            }
+        )
+
     def get_result(self, captcha_id: str) -> PollResult:
         """Fetch one poll cycle. Raises :class:`CaptchaAINotReadyError` if not ready."""
         data = self._get(action="get", id=captcha_id)
