@@ -83,12 +83,16 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 > Test-server connection details live only in `.secrets/` (gitignored).
 
 
-- [ ] `report.write_html_report` (Jinja2 template)
-- [ ] `report.write_json_report` validated against published JSON Schema
-- [ ] `--ci`, `--fail-on`, exit codes per plan §10.6
-- [ ] `scripts/provision-server.sh` (idempotent)
-- [ ] `scripts/run-real-e2e.sh` gated by `DOCTOR_ALLOW_REAL_API=1`
-- [ ] First real CaptchaAI solve recorded in `docs/real-e2e-evidence.md`
+- [x] `report.write_html_report` (single self-contained HTML, no external assets, XSS-safe)
+- [x] `report.write_json_report` validated against published JSON Schema (`report.REPORT_JSON_SCHEMA`, Draft 2020-12)
+- [x] `recommendation` field wired into JSON + HTML via `classifier.recommendation_for`
+- [x] `captchaai-doctor schema` CLI subcommand exports the JSON Schema
+- [x] `--ci`, `--fail-on`, exit codes per plan §10.6 (already wired in Phase 3, tested in Phase 5)
+- [x] `--no-html` flag for callers that only want JSON
+- [x] `sample-reports/` regenerated from fixtures via `scripts/regenerate_sample_reports.py` (5 samples)
+- [ ] `scripts/provision-server.sh` (idempotent) — deferred (needs infra decision)
+- [ ] `scripts/run-real-e2e.sh` gated by `DOCTOR_ALLOW_REAL_API=1` — deferred (needs infra decision)
+- [ ] First real CaptchaAI solve recorded in `docs/real-e2e-evidence.md` — deferred (needs live API spend approval)
 - [ ] `.github/workflows/demo-smoke.yml`
 - [ ] **Checkpoint**
 

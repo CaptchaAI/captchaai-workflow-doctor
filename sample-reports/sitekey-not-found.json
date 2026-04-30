@@ -1,0 +1,33 @@
+{
+  "action_steps": [
+    {
+      "detail": null,
+      "selector": "input[name='email']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "input[name='password']",
+      "succeeded": true,
+      "type": "fill"
+    }
+  ],
+  "captcha_id_redacted": "A1B2****",
+  "captcha_type": "turnstile",
+  "detail": "no sitekey at selector '[data-sitekey]' (but the page does expose a 'recaptcha_v2' widget at 'div.g-recaptcha[data-sitekey]'; update detection.sitekey_selector)",
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 2,
+  "poll_seconds": 4.0,
+  "profile_name": "local-demo-login-turnstile",
+  "recommendation": "No sitekey was found at the configured selector. Open the page in a browser, inspect the captcha widget, and update detection.sitekey_selector.",
+  "root_cause": "sitekey_not_found",
+  "screenshots": [
+    "01-no-sitekey.png"
+  ],
+  "sitekey_found": null,
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "failure",
+  "target_url": "http://127.0.0.1:8765/login"
+}

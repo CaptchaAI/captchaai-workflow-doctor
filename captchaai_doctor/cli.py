@@ -41,6 +41,27 @@ def validate_profile(profile_path: str) -> None:
     click.echo(f"OK: {profile.name} ({profile.captcha_type}) -> {profile.target.url}")
 
 
+@main.command("schema")
+@click.option(
+    "--output",
+    "output_path",
+    type=click.Path(dir_okay=False),
+    default=None,
+    help="Write schema to this file instead of stdout.",
+)
+def schema(output_path: str | None) -> None:
+    """Print the JSON Schema for the run report (machine-consumable)."""
+    import json
+
+    from captchaai_doctor.report import REPORT_JSON_SCHEMA, write_schema
+
+    if output_path:
+        path = write_schema(output_path)
+        click.echo(str(path))
+    else:
+        click.echo(json.dumps(REPORT_JSON_SCHEMA, indent=2, sort_keys=True))
+
+
 @main.command("run")
 @click.option(
     "--profile", "profile_path", required=True, type=click.Path(exists=True, dir_okay=False)
@@ -60,6 +81,14 @@ def validate_profile(profile_path: str) -> None:
     default=None,
     help="Write the JSON report to this path (defaults to <artifact-dir>/report.json).",
 )
+@click.option(
+    "--html",
+    "html_path",
+    type=click.Path(dir_okay=False),
+    default=None,
+    help="Write a self-contained HTML report to this path (defaults to <artifact-dir>/report.html).",
+)
+@click.option("--no-html", is_flag=True, default=False, help="Skip HTML report generation.")
 @click.option("--headed", is_flag=True, default=False)
 @click.option(
     "--mock-captchaai",
@@ -79,6 +108,8 @@ def run(
     api_key: str | None,
     artifact_dir: str,
     json_path: str | None,
+    html_path: str | None,
+    no_html: bool,
     headed: bool,
     mock_captchaai: bool,
     ci: bool,
@@ -91,7 +122,7 @@ def run(
 
     from captchaai_doctor.captchaai_client import CaptchaAIClient
     from captchaai_doctor.fake_captchaai import FakeCaptchaAIClient, make_fake_client
-    from captchaai_doctor.report import write_json_report
+    from captchaai_doctor.report import write_html_report, write_json_report
     from captchaai_doctor.runner import run_workflow
 
     try:
@@ -121,14 +152,23 @@ def run(
                 client.close()
 
     write_json_report(result, json_target)
+    html_target: Path | None = None
+    if not no_html:
+        html_target = Path(html_path) if html_path else artifacts / "report.html"
+        write_html_report(result, html_target)
 
     if ci:
-        click.echo(
+        line = (
             f"status={result.status} root_cause={result.root_cause} "
             f"duration={result.duration_seconds}s report={json_target}"
         )
+        if html_target is not None:
+            line += f" html={html_target}"
+        click.echo(line)
     else:
         click.echo(f"\nReport: {json_target}")
+        if html_target is not None:
+            click.echo(f"HTML:   {html_target}")
         click.echo(f"Status: {result.status}  Root cause: {result.root_cause}")
         if result.detail:
             click.echo(f"Detail: {result.detail}")
@@ -242,7 +282,7 @@ def _run_demo(
         )
 
         from captchaai_doctor.fake_captchaai import make_fake_client
-        from captchaai_doctor.report import write_json_report
+        from captchaai_doctor.report import write_html_report, write_json_report
         from captchaai_doctor.runner import run_workflow
 
         artifacts = Path(artifact_dir)
@@ -250,7 +290,9 @@ def _run_demo(
             profile, client=make_fake_client(), artifact_dir=artifacts, headed=headed
         )
         write_json_report(result, artifacts / "report.json")
+        write_html_report(result, artifacts / "report.html")
         click.echo(f"\nReport: {artifacts / 'report.json'}")
+        click.echo(f"HTML:   {artifacts / 'report.html'}")
         click.echo(f"Status: {result.status}  Root cause: {result.root_cause}")
         if result.detail:
             click.echo(f"Detail: {result.detail}")
