@@ -1,0 +1,57 @@
+{
+  "action_steps": [
+    {
+      "detail": null,
+      "selector": "input[name='email']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "input[name='password']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "textarea[name='cf-turnstile-response']",
+      "succeeded": true,
+      "type": "inject_token"
+    },
+    {
+      "detail": null,
+      "selector": null,
+      "succeeded": true,
+      "type": "invoke_callback_if_detected"
+    },
+    {
+      "detail": null,
+      "selector": null,
+      "succeeded": true,
+      "type": "wait"
+    },
+    {
+      "detail": null,
+      "selector": "button[type='submit']",
+      "succeeded": true,
+      "type": "click"
+    }
+  ],
+  "captcha_id_redacted": "A1B2****",
+  "captcha_type": "turnstile",
+  "detail": null,
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 2,
+  "poll_seconds": 4.0,
+  "profile_name": "local-demo-login-turnstile",
+  "recommendation": "Workflow succeeded. No action required.",
+  "root_cause": "ok",
+  "screenshots": [
+    "03-final.png"
+  ],
+  "sitekey_found": "0xMOCK_SITEKEY_DEMO",
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "success",
+  "target_url": "http://127.0.0.1:8765/login"
+}
