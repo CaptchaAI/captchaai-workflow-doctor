@@ -1,35 +1,112 @@
 # CaptchaAI Workflow Doctor
 
-> Status: **pre-alpha** — under active development. Do not use yet.
+> Status: **beta** — feature-complete for v0.1.0, see [PROGRESS.md](PROGRESS.md).
 
-A diagnostic tool for debugging CAPTCHA-solving workflows from CaptchaAI API request to browser acceptance.
+A diagnostic CLI for debugging CAPTCHA-solving workflows from CaptchaAI
+API request to browser acceptance. Run one command, get a labeled
+root cause and a one-line fix.
 
-## What it solves
+```text
+$ captchaai-doctor run --profile profiles/checkout.yaml --ci --fail-on workflow
+status=failure root_cause=callback_not_invoked duration=4.71s report=run-artifacts/report.json html=run-artifacts/report.html
+```
 
-When a CAPTCHA solver returns a token but the page still rejects the workflow, the failure can be in many places: wrong sitekey, wrong page URL, token injected into the wrong field, callback not triggered, token expired, session mismatch, and more. CaptchaAI Workflow Doctor runs the full workflow against an authorized profile and tells you *exactly* where it broke.
+## What it does
 
-## Responsible Use
+When the solver returns a token but your page still rejects the
+workflow, doctor walks the full pipeline against a real Chromium
+browser — submit → poll → inject → invoke callback → submit → verify —
+and tells you *exactly* where it broke. See
+[docs/failure-taxonomy.md](docs/failure-taxonomy.md) for the 12
+possible root causes.
 
-CaptchaAI Workflow Doctor is designed for developers testing CAPTCHA-solving integrations in systems they own, operate, or are authorized to test.
+Every run produces:
 
-Do not use this project for unauthorized access, spam, credential attacks, account farming, or activity that violates a website's terms or applicable law.
+- `report.json` (validates against [the published JSON Schema](docs/report-schema.md))
+- `report.html` (single self-contained file with screenshots)
+- a Playwright trace and per-step screenshots
 
-## Quickstart
+## Responsible use
 
-> Phase 0 ships only the CLI skeleton. Real workflow runs land in Phase 3.
+Doctor is for systems you own, operate, or are explicitly authorized to
+test. It is not for bypassing third-party CAPTCHAs. See
+[docs/responsible-use.md](docs/responsible-use.md).
+
+## Quickstart (10 minutes from a fresh checkout)
 
 ```bash
 git clone https://github.com/CaptchaAI/captchaai-workflow-doctor.git
 cd captchaai-workflow-doctor
 python -m venv .venv
-. .venv/bin/activate          # on Windows: .venv\Scripts\Activate.ps1
+. .venv/bin/activate                    # Windows: .venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
+python -m playwright install chromium
 captchaai-doctor --help
 ```
 
-## Project status
+### Run the bundled demos (no API key required)
 
-See [PROGRESS.md](PROGRESS.md) for a per-phase checklist of what's done and what's pending.
+```bash
+captchaai-doctor demo turnstile
+captchaai-doctor demo recaptcha-v2
+```
+
+Each spins up a local Flask app, drives it through the full pipeline
+with the fake CaptchaAI client, and writes
+`run-artifacts/demo-*/report.{json,html}`.
+
+### Run against your own profile + the real CaptchaAI API
+
+```bash
+export CAPTCHAAI_API_KEY=...   # see .env.example
+captchaai-doctor run \
+  --profile profiles/turnstile-generic.yaml \
+  --artifact-dir run-artifacts/ \
+  --ci --fail-on workflow
+```
+
+## Documentation
+
+- [Overview](docs/overview.md)
+- [Profile schema](docs/profile-schema.md) — write your own profile
+- [Failure taxonomy](docs/failure-taxonomy.md) — what each `root_cause` means
+- [Token lifecycle](docs/token-lifecycle.md) — the four constraints
+- [Report schema](docs/report-schema.md) — JSON shape + how to validate
+- [CI integration](docs/ci-integration.md) — wiring into your pipeline
+- [Architecture](docs/architecture.md) — module map
+- [Troubleshooting](docs/troubleshooting.md) — common gotchas
+- [Real-API evidence log](docs/real-e2e-evidence.md)
+
+## CLI
+
+```text
+captchaai-doctor run             # run a profile end-to-end
+captchaai-doctor demo turnstile  # bundled Turnstile mock + driver
+captchaai-doctor demo recaptcha-v2
+captchaai-doctor validate-profile <path>
+captchaai-doctor schema [--output path]
+```
+
+Exit codes follow [docs/ci-integration.md](docs/ci-integration.md):
+`0` ok · `1` workflow failure (with `--fail-on`) · `2` profile/usage error.
+
+## Sample reports
+
+`sample-reports/` contains five fixtures rendered by
+`scripts/regenerate_sample_reports.py`:
+
+- `success` — happy path
+- `verification-failed`
+- `callback-not-invoked`
+- `sitekey-not-found`
+- `captchaai-balance`
+
+Open any `.html` to see what doctor produces in the wild.
+
+## Status & contributing
+
+See [PROGRESS.md](PROGRESS.md) for the per-phase checklist and
+[CONTRIBUTING.md](CONTRIBUTING.md) for the dev workflow.
 
 ## License
 
