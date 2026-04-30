@@ -21,6 +21,7 @@ worse than false negatives because the user trusts our root cause.
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-CaptchaKind = Literal["turnstile", "recaptcha_v2", "unknown"]
+CaptchaKind = Literal["turnstile", "recaptcha_v2", "recaptcha_v3", "unknown"]
 
 # (selector, attribute that holds the sitekey, kind)
 _HEURISTIC_RULES: list[tuple[str, str, CaptchaKind]] = [
@@ -46,10 +47,16 @@ _HEURISTIC_RULES: list[tuple[str, str, CaptchaKind]] = [
     ("[data-sitekey]", "data-sitekey", "unknown"),
 ]
 
+# reCAPTCHA v3 has no widget div — only a script tag with `?render=SITEKEY`.
+_RECAPTCHA_V3_SCRIPT_SELECTOR = "script[src*='recaptcha'][src*='render=']"
+_RENDER_QUERY_RE = re.compile(r"[?&]render=([^&]+)")
+
 # Default callback names to probe per kind, in priority order.
 DEFAULT_CALLBACK_CANDIDATES: dict[CaptchaKind, list[str]] = {
     "turnstile": ["onTurnstileSuccess", "turnstileCallback", "onloadTurnstileCallback"],
     "recaptcha_v2": ["onRecaptchaSuccess", "recaptchaCallback", "onloadRecaptchaCallback"],
+    # v3 has no callback in the page; the doctor uses grecaptcha.execute().
+    "recaptcha_v3": [],
     "unknown": [],
 }
 
@@ -57,6 +64,9 @@ DEFAULT_CALLBACK_CANDIDATES: dict[CaptchaKind, list[str]] = {
 DEFAULT_RESPONSE_FIELD: dict[CaptchaKind, str] = {
     "turnstile": "textarea[name='cf-turnstile-response']",
     "recaptcha_v2": "textarea[name='g-recaptcha-response']",
+    # v3 stores its token in a hidden input named after the action,
+    # but the canonical default field is g-recaptcha-response.
+    "recaptcha_v3": "input[name='g-recaptcha-response']",
     "unknown": "",
 }
 
@@ -72,7 +82,12 @@ class DetectedWidget:
 
 
 def read_sitekey(page: Page, detection: Detection) -> str | None:
-    """Read the sitekey from the profile-supplied selector."""
+    """Read the sitekey from the profile-supplied selector.
+
+    Looks at ``data-sitekey``, ``data-sitekey-id``, and ``value`` attrs;
+    additionally extracts the sitekey from a ``?render=SITEKEY`` query
+    string in ``src`` (the reCAPTCHA v3 integration shape).
+    """
     selector = detection.sitekey_selector
     if not selector:
         return None
@@ -87,6 +102,11 @@ def read_sitekey(page: Page, detection: Detection) -> str | None:
         value = handle.get_attribute(attr)
         if value:
             return value
+    src = handle.get_attribute("src")
+    if src:
+        match = _RENDER_QUERY_RE.search(src)
+        if match:
+            return match.group(1)
     return None
 
 
@@ -105,6 +125,21 @@ def detect_widget(page: Page) -> DetectedWidget | None:
         return DetectedWidget(
             kind=kind, sitekey=sitekey, selector_matched=selector, sitekey_attribute=attr
         )
+    # Fall back to reCAPTCHA v3 (no widget div, only a script tag).
+    try:
+        handle = page.query_selector(_RECAPTCHA_V3_SCRIPT_SELECTOR)
+    except Exception:  # pragma: no cover - defensive
+        handle = None
+    if handle is not None:
+        src = handle.get_attribute("src") or ""
+        match = _RENDER_QUERY_RE.search(src)
+        if match:
+            return DetectedWidget(
+                kind="recaptcha_v3",
+                sitekey=match.group(1),
+                selector_matched=_RECAPTCHA_V3_SCRIPT_SELECTOR,
+                sitekey_attribute="src?render=",
+            )
     return None
 
 

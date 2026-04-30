@@ -47,6 +47,10 @@ RECOMMENDATIONS: dict[str, str] = {
         "The token was injected but the server still rejected the submission. Confirm the "
         "response field name and that the form's POST includes it."
     ),
+    "recaptcha_v3_action_missing": (
+        "Profile uses captcha_type=recaptcha_v3 but detection.action is empty. Set it to the "
+        "exact action name the page passes to grecaptcha.execute (e.g. 'login', 'submit')."
+    ),
     "unknown": "An unexpected error occurred. See `detail` in the report for the raw exception.",
 }
 

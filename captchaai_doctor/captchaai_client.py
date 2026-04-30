@@ -204,6 +204,35 @@ class CaptchaAIClient:
             }
         )
 
+    def submit_recaptcha_v3(
+        self,
+        *,
+        sitekey: str,
+        page_url: str,
+        action: str,
+        min_score: float = 0.3,
+    ) -> SubmitResult:
+        """Submit a reCAPTCHA v3 challenge.
+
+        v3 reuses ``method=userrecaptcha`` with ``version=v3`` plus the
+        page-declared ``action`` and an advisory ``min_score`` the
+        solver tries to meet.
+        """
+        if not action:
+            raise ValueError("submit_recaptcha_v3 requires a non-empty `action`")
+        if not 0.0 <= min_score <= 1.0:
+            raise ValueError("min_score must be between 0.0 and 1.0")
+        return self._submit(
+            {
+                "method": "userrecaptcha",
+                "googlekey": sitekey,
+                "pageurl": page_url,
+                "version": "v3",
+                "action": action,
+                "min_score": f"{min_score:g}",
+            }
+        )
+
     def get_result(self, captcha_id: str) -> PollResult:
         """Fetch one poll cycle. Raises :class:`CaptchaAINotReadyError` if not ready."""
         data = self._get(action="get", id=captcha_id)

@@ -25,3 +25,19 @@ pytest tests/test_live_solve.py -v
 
 Then append a row above with the result. **Do NOT** ever paste the API
 key, captcha id, or full token into this file — only the test summary.
+
+
+## reCAPTCHA v3 — live solve verified (Phase 7a)
+
+- Date: 2026-04-30
+- Test pair: `sitekey=6LcR_okUAAAAAPYrPe-HK_0RULO1aZM15ENyM-Mf` on `https://antcpt.com/score_detector/`, `action=homepage`, `min_score=0.3`
+- Endpoint: `https://ocr.captchaai.com/in.php` with `method=userrecaptcha&version=v3&action=homepage&min_score=0.3`
+- Result: real ~80-character token returned in ~5s
+- Test: `pytest tests/test_live_solve.py::test_real_recaptcha_v3_solve_returns_a_real_token`
+- Status: PASSED (gated on `DOCTOR_ALLOW_REAL_API=1` + `DOCTOR_ALLOW_REAL_SOLVE=1`)
+
+## hCaptcha — NOT supported by CaptchaAI (decision record)
+
+- Probed `https://ocr.captchaai.com/in.php` with `method=hcaptcha` against multiple sitekey/pageurl combos; every response was `{"status":0,"request":"ERROR_SERVER_ERROR"}`.
+- Cross-checked with docs.captchaai.com supported list: hCaptcha is absent (Normal Captcha, BLS, reCAPTCHA v2/v3, Turnstile, Cloudflare Challenge, Geetest V3 are listed).
+- Decision: dropped hCaptcha from the v0.2 scope; replaced with **Cloudflare Challenge** in Phase 7c.

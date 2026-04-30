@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CaptchaAI Doctor &mdash; local-demo-form-recaptcha-v3</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+            sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem;
+            color: #222; }
+    h1 { margin-bottom: 0.25rem; }
+    .meta { color: #555; margin-top: 0; }
+    .badge { color: #fff; padding: 0.15rem 0.6rem; border-radius: 0.4rem;
+              font-size: 0.85rem; letter-spacing: 0.05em; }
+    .grid { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem;
+             margin: 1rem 0; }
+    .grid dt { font-weight: 600; color: #444; }
+    .grid dd { margin: 0; }
+    .recommendation { background: #fff8e6; border-left: 4px solid #f0ad4e;
+                       padding: 0.75rem 1rem; border-radius: 0 0.4rem 0.4rem 0; }
+    .steps { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .steps th, .steps td { border-bottom: 1px solid #eee; padding: 0.4rem 0.6rem;
+                            text-align: left; vertical-align: top; }
+    .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 1rem; }
+    .shots figure { margin: 0; }
+    .shots img { max-width: 100%; border: 1px solid #ddd; border-radius: 0.3rem; }
+    .shots figcaption { font-size: 0.85rem; color: #666; }
+    code { background: #f4f4f4; padding: 0.05rem 0.3rem; border-radius: 0.25rem; }
+    section { margin-top: 2rem; }
+    h2 { border-bottom: 1px solid #eee; padding-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <h1>local-demo-form-recaptcha-v3 <span class="badge" style="background:#b3261e">FAILURE</span></h1>
+  <p class="meta">recaptcha_v3 &middot; <code>http://127.0.0.1:8768/contact</code></p>
+
+  <section>
+    <h2>Summary</h2>
+    <dl class="grid">
+      <dt>Status</dt><dd>failure</dd>
+      <dt>Root cause</dt><dd><code>recaptcha_v3_action_missing</code></dd>
+      <dt>Detail</dt><dd>recaptcha_v3 requires detection.action in the profile (the action name the page passes to grecaptcha.execute)</dd>
+      <dt>Started</dt><dd>2026-04-30T21:00:00Z</dd>
+      <dt>Ended</dt><dd>2026-04-30T21:00:08Z</dd>
+      <dt>Duration</dt><dd>8.123 s</dd>
+      <dt>Sitekey found</dt><dd><code>6LcMOCK_RECAPTCHA_V3_SITEKEY_DEMO</code></dd>
+      <dt>Captcha ID</dt><dd><code>—</code> (redacted)</dd>
+      <dt>Poll attempts</dt><dd>0</dd>
+      <dt>Poll seconds</dt><dd>0.000</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Recommendation</h2>
+    <p class="recommendation">Profile uses captcha_type=recaptcha_v3 but detection.action is empty. Set it to the exact action name the page passes to grecaptcha.execute (e.g. &#x27;login&#x27;, &#x27;submit&#x27;).</p>
+  </section>
+
+  <section>
+    <h2>Action timeline</h2>
+    <table class="steps"><thead><tr><th></th><th>type</th><th>selector</th><th>detail</th></tr></thead><tbody><tr><td style="color:#1e7f3b;font-weight:bold">OK</td><td>fill</td><td><code>input[name=&#x27;name&#x27;]</code></td><td></td></tr><tr><td style="color:#1e7f3b;font-weight:bold">OK</td><td>fill</td><td><code>textarea[name=&#x27;message&#x27;]</code></td><td></td></tr></tbody></table>
+  </section>
+
+  <section>
+    <h2>Screenshots</h2>
+    <div class="shots"><figure><a href="01-detected.png"><img src="01-detected.png" alt=""></a><figcaption>01-detected.png</figcaption></figure></div>
+  </section>
+
+  <section>
+    <h2>Raw JSON</h2>
+    <pre><code>{
+  &quot;action_steps&quot;: [
+    {
+      &quot;detail&quot;: null,
+      &quot;selector&quot;: &quot;input[name=&#x27;name&#x27;]&quot;,
+      &quot;succeeded&quot;: true,
+      &quot;type&quot;: &quot;fill&quot;
+    },
+    {
+      &quot;detail&quot;: null,
+      &quot;selector&quot;: &quot;textarea[name=&#x27;message&#x27;]&quot;,
+      &quot;succeeded&quot;: true,
+      &quot;type&quot;: &quot;fill&quot;
+    }
+  ],
+  &quot;captcha_id_redacted&quot;: null,
+  &quot;captcha_type&quot;: &quot;recaptcha_v3&quot;,
+  &quot;detail&quot;: &quot;recaptcha_v3 requires detection.action in the profile (the action name the page passes to grecaptcha.execute)&quot;,
+  &quot;duration_seconds&quot;: 8.123,
+  &quot;ended_at&quot;: &quot;2026-04-30T21:00:08Z&quot;,
+  &quot;poll_attempts&quot;: 0,
+  &quot;poll_seconds&quot;: 0.0,
+  &quot;profile_name&quot;: &quot;local-demo-form-recaptcha-v3&quot;,
+  &quot;recommendation&quot;: &quot;Profile uses captcha_type=recaptcha_v3 but detection.action is empty. Set it to the exact action name the page passes to grecaptcha.execute (e.g. &#x27;login&#x27;, &#x27;submit&#x27;).&quot;,
+  &quot;root_cause&quot;: &quot;recaptcha_v3_action_missing&quot;,
+  &quot;screenshots&quot;: [
+    &quot;01-detected.png&quot;
+  ],
+  &quot;sitekey_found&quot;: &quot;6LcMOCK_RECAPTCHA_V3_SITEKEY_DEMO&quot;,
+  &quot;started_at&quot;: &quot;2026-04-30T21:00:00Z&quot;,
+  &quot;status&quot;: &quot;failure&quot;,
+  &quot;target_url&quot;: &quot;http://127.0.0.1:8768/contact&quot;
+}</code></pre>
+  </section>
+</body>
+</html>

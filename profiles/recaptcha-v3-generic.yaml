@@ -1,0 +1,53 @@
+# Generic reCAPTCHA v3 profile template.
+#
+# v3 has no UX widget. The page loads a script with `?render=SITEKEY`
+# and calls `grecaptcha.execute(sitekey, {action})` to mint a token.
+# Set detection.action to the EXACT action name your page uses.
+#
+# Copy this file, rename it, and adjust:
+#   - target.url and allowed_domains for YOUR authorized test page
+#   - detection.action and detection.min_score
+#   - selectors to match the page's hidden response field
+#
+# NEVER put API keys, passwords, or tokens directly in this file.
+
+name: recaptcha-v3-generic
+captcha_type: recaptcha_v3
+
+target:
+  url: "https://example.com/contact"
+  allowed_domains:
+    - "example.com"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  screenshots: true
+
+captchaai:
+  polling_interval_seconds: 5
+  max_wait_seconds: 240
+
+detection:
+  sitekey_selector: "script[src*='recaptcha'][src*='render=']"
+  response_field_selector: "input[name='g-recaptcha-response']"
+  callback_candidates: []
+  action: "submit"
+  min_score: 0.3
+
+actions:
+  before_solve: []
+  after_token:
+    - type: inject_token
+      selector: "input[name='g-recaptcha-response']"
+    - type: click
+      selector: "button[type='submit']"
+
+success:
+  url_contains:
+    - "/thanks"
+
+failure:
+  any_text:
+    - "please complete the captcha"

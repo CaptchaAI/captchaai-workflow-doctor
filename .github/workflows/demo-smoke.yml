@@ -52,6 +52,12 @@ jobs:
           QA_PASSWORD: demo-pass
         run: captchaai-doctor demo recaptcha-v2 --artifact-dir run-artifacts/ci-demo-recaptcha
 
+      - name: Run CLI reCAPTCHA-v3 demo end-to-end
+        env:
+          QA_NAME: demo-user
+          QA_MESSAGE: hello from ci
+        run: captchaai-doctor demo recaptcha-v3 --artifact-dir run-artifacts/ci-demo-recaptcha-v3
+
       - name: Upload artifacts on failure
         if: always()
         uses: actions/upload-artifact@v4
