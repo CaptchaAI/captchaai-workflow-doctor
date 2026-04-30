@@ -26,6 +26,16 @@ from playwright.sync_api import (
     sync_playwright,
 )
 
+from captchaai_doctor.detector import read_sitekey as _read_sitekey
+from captchaai_doctor.injector import (
+    InjectionError,
+)
+from captchaai_doctor.injector import (
+    inject_token as _inject_token,
+)
+from captchaai_doctor.injector import (
+    invoke_callback as _invoke_callback,
+)
 from captchaai_doctor.schemas import (
     Action,
     ClickAction,
@@ -139,19 +149,9 @@ class BrowserSession:
                     "inject_token requires a CAPTCHA token, none was solved yet"
                 )
             try:
-                # Use evaluate so we can write to a hidden textarea/input regardless
-                # of visibility (Playwright .fill() refuses hidden fields).
-                self.page.eval_on_selector(
-                    action.selector,
-                    "(el, value) => { el.value = value; "
-                    "el.dispatchEvent(new Event('input', {bubbles:true})); "
-                    "el.dispatchEvent(new Event('change', {bubbles:true})); }",
-                    token,
-                )
-            except Exception as exc:
-                raise BrowserActionError(
-                    f"inject_token failed for {action.selector!r}: {exc}"
-                ) from exc
+                _inject_token(self.page, action.selector, token)
+            except InjectionError as exc:
+                raise BrowserActionError(str(exc)) from exc
             return
 
         if isinstance(action, InvokeCallbackIfDetectedAction):
@@ -163,8 +163,15 @@ class BrowserSession:
                 raise BrowserActionError(
                     "invoke_callback_if_detected requires a CAPTCHA token, none was solved yet"
                 )
-            invoked = self._invoke_first_callback(detection.callback_candidates, token)
-            if not invoked:
+            try:
+                outcome = _invoke_callback(self.page, list(detection.callback_candidates), token)
+            except InjectionError as exc:
+                raise BrowserActionError(str(exc)) from exc
+            if outcome.error:
+                raise BrowserActionError(
+                    f"callback {outcome.callback_name!r} threw: {outcome.error}"
+                )
+            if not outcome.invoked:
                 raise BrowserActionError(
                     "none of the callback candidates were defined on the page: "
                     f"{detection.callback_candidates}"
@@ -175,45 +182,10 @@ class BrowserSession:
             f"unsupported action type: {action.type}"
         )
 
-    def _invoke_first_callback(self, candidates: list[str], token: str) -> bool:
-        script = """
-            ({candidates, token}) => {
-                for (const name of candidates) {
-                    const fn = window[name];
-                    if (typeof fn === 'function') {
-                        try { fn(token); } catch (e) { return {ok: false, name, error: String(e)}; }
-                        return {ok: true, name};
-                    }
-                }
-                return {ok: false, name: null};
-            }
-        """
-        result = self.page.evaluate(script, {"candidates": candidates, "token": token})
-        if result.get("ok"):
-            log.debug("invoked callback %s", result.get("name"))
-            return True
-        if result.get("error"):
-            raise BrowserActionError(
-                f"callback {result.get('name')!r} threw: {result.get('error')}"
-            )
-        return False
-
     # ---- detection ------------------------------------------------------
 
     def read_sitekey(self, detection: Detection) -> str | None:
-        if not detection.sitekey_selector:
-            return None
-        try:
-            handle = self.page.query_selector(detection.sitekey_selector)
-            if handle is None:
-                return None
-            for attr in ("data-sitekey", "data-sitekey-id", "value"):
-                value = handle.get_attribute(attr)
-                if value:
-                    return value
-        except Exception as exc:  # pragma: no cover - defensive
-            log.warning("sitekey read failed: %s", exc)
-        return None
+        return _read_sitekey(self.page, detection)
 
     # ---- screenshots ----------------------------------------------------
 

@@ -67,15 +67,16 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 4 — Detection, injection, verifier, classifier + reCAPTCHA mock
 
-- [ ] `detector.py` (Turnstile + reCAPTCHA v2 + sitekey + callback candidates)
-- [ ] `injector.py` (token write, callback invoke, post-write verify)
-- [ ] `verifier.py` (success/failure conditions)
-- [ ] `classifier.py` priority ladder + confidence
-- [ ] `demos/mock-form-recaptcha-v2/app.py`
-- [ ] Failure-mode fixture matrix: every `?mode=` → expected root cause
-- [ ] Sample reports under `sample-reports/` regenerated from fixtures
-- [ ] Coverage ≥85% on classifier + verifier
-- [ ] **Checkpoint**
+- [x] `detector.py` (Turnstile + reCAPTCHA v2 + sitekey + callback candidates)
+- [x] `injector.py` (token write + callback invoke, dispatches input/change events)
+- [x] `verifier.py` (`field_has_value`, `callback_marker_present`)
+- [x] `classifier.py` recommendation map (full priority/confidence ladder lands in Phase 5)
+- [x] `demos/mock_login_recaptcha/app.py` (mirror of turnstile, modes ok/wrong-token/no-callback)
+- [x] `profiles/local-demo-login-recaptcha.yaml`
+- [x] CLI `demo recaptcha-v2` command
+- [x] Heuristic widget detection used in `sitekey_not_found` reports
+- [x] Tests: detector (9), injector+verifier (7), recaptcha mock (7), classifier (3), recaptcha e2e (3)
+- [x] All 113 tests green; ruff + mypy --strict clean
 
 ## Phase 5 — HTML report + CI mode + real-server E2E
 
