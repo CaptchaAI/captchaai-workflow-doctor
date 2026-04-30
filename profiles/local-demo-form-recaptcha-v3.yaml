@@ -1,0 +1,55 @@
+name: local-demo-form-recaptcha-v3
+captcha_type: recaptcha_v3
+
+target:
+  url: "http://127.0.0.1:8768/contact"
+  allowed_domains:
+    - "127.0.0.1"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  record_trace: true
+  screenshots: true
+
+captchaai:
+  submit_endpoint: "https://ocr.captchaai.com/in.php"
+  result_endpoint: "https://ocr.captchaai.com/res.php"
+  polling_interval_seconds: 5
+  max_wait_seconds: 180
+
+detection:
+  # v3 has no widget div; the sitekey lives in a script tag's `?render=` query.
+  sitekey_selector: "script[src*='recaptcha'][src*='render=']"
+  response_field_selector: "input[name='g-recaptcha-response']"
+  callback_candidates: []
+  action: "submit_contact"
+  min_score: 0.3
+
+actions:
+  before_solve:
+    - type: fill
+      selector: "input[name='name']"
+      value_env: "QA_NAME"
+    - type: fill
+      selector: "textarea[name='message']"
+      value_env: "QA_MESSAGE"
+
+  after_token:
+    - type: inject_token
+      selector: "input[name='g-recaptcha-response']"
+    - type: wait
+      milliseconds: 200
+    - type: click
+      selector: "button[type='submit']"
+
+success:
+  any_selector:
+    - "[data-testid='thanks']"
+  url_contains:
+    - "/thanks"
+
+failure:
+  any_text:
+    - "captcha verification failed"

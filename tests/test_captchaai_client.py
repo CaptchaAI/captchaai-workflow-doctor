@@ -65,6 +65,32 @@ def test_submit_recaptcha_v2_ok(client: CaptchaAIClient) -> None:
 
 
 @respx.mock
+def test_submit_recaptcha_v3_sends_version_and_action(client: CaptchaAIClient) -> None:
+    route = respx.post(SUBMIT_URL).respond(json={"status": 1, "request": "5550000"})
+    result = client.submit_recaptcha_v3(
+        sitekey="6Lc-V3", page_url="https://x.test/page", action="login", min_score=0.5
+    )
+    assert result.captcha_id == "5550000"
+    body = route.calls.last.request.content.decode()
+    assert "method=userrecaptcha" in body
+    assert "version=v3" in body
+    assert "action=login" in body
+    assert "min_score=0.5" in body
+
+
+def test_submit_recaptcha_v3_requires_action(client: CaptchaAIClient) -> None:
+    with pytest.raises(ValueError, match="action"):
+        client.submit_recaptcha_v3(sitekey="6Lc-V3", page_url="https://x.test", action="")
+
+
+def test_submit_recaptcha_v3_validates_min_score(client: CaptchaAIClient) -> None:
+    with pytest.raises(ValueError, match="min_score"):
+        client.submit_recaptcha_v3(
+            sitekey="6Lc-V3", page_url="https://x.test", action="login", min_score=1.5
+        )
+
+
+@respx.mock
 def test_submit_accepts_integer_captcha_id(client: CaptchaAIClient) -> None:
     """Production CaptchaAI returns captcha_id as an int for userrecaptcha."""
     respx.post(SUBMIT_URL).respond(json={"status": 1, "request": 3397637370})

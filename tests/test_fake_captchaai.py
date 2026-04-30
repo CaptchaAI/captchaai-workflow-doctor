@@ -24,6 +24,18 @@ def test_get_result_returns_token_immediately() -> None:
     assert sub.captcha_id in c.polled
 
 
+def test_submit_recaptcha_v3_records_action_and_version() -> None:
+    c = FakeCaptchaAIClient()
+    sub = c.submit_recaptcha_v3(
+        sitekey="6Lc...", page_url="https://e.test", action="login", min_score=0.7
+    )
+    assert sub.captcha_id
+    assert c.submitted[-1]["method"] == "userrecaptcha"
+    assert c.submitted[-1]["version"] == "v3"
+    assert c.submitted[-1]["action"] == "login"
+    assert c.submitted[-1]["min_score"] == "0.7"
+
+
 def test_not_ready_count_is_consumed() -> None:
     c = FakeCaptchaAIClient(not_ready_count=2)
     sub = c.submit_turnstile(sitekey="x", page_url="https://e.test")

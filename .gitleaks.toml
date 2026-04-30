@@ -26,8 +26,16 @@ regexes = [
   # 1468899d359decf9006aaba489fdf41af30d6ad7 and has been ROTATED
   # at the provider. Allowlisted so full-history scans pass.
   '''(?i)ad0926ac86e0c0157f839e0fe4850bbc''',
+  # Public reCAPTCHA v3 test sitekey published by antcpt.com (used in
+  # CaptchaAI / 2captcha integration guides for v3 score testing).
+  # Sitekeys are PUBLIC by design — they ship in HTML — and this one
+  # is universally documented; not a secret.
+  '''6LcR_okUAAAAAPYrPe-HK_0RULO1aZM15ENyM-Mf''',
 ]
 paths = [
   # Allowlist the test files anywhere they appear in history.
   '''tests/.*\.py$''',
+  # The evidence doc records the public test-pair sitekey used for the
+  # gated live-solve test; it is not a credential.
+  '''docs/real-e2e-evidence\.md$''',
 ]

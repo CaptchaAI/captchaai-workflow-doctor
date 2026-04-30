@@ -80,6 +80,34 @@ def test_detect_widget_classifies_recaptcha(page: object) -> None:
     assert widget.sitekey == "6Lc-XYZ"
 
 
+def test_detect_widget_classifies_recaptcha_v3(page: object) -> None:
+    html = (
+        "<html><body>"
+        '<script src="https://www.google.com/recaptcha/api.js?render=6LcV3KEY"></script>'
+        "</body></html>"
+    )
+    page.goto(_data_url(html))  # type: ignore[attr-defined]
+    widget = detect_widget(page)  # type: ignore[arg-type]
+    assert widget is not None
+    assert widget.kind == "recaptcha_v3"
+    assert widget.sitekey == "6LcV3KEY"
+
+
+def test_read_sitekey_extracts_v3_render_query(page: object) -> None:
+    html = (
+        "<html><body>"
+        '<script src="https://www.google.com/recaptcha/api.js?render=6LcRENDERED"></script>'
+        "</body></html>"
+    )
+    page.goto(_data_url(html))  # type: ignore[attr-defined]
+    detection = Detection(
+        sitekey_selector="script[src*='recaptcha'][src*='render=']",
+        response_field_selector="input[name='g-recaptcha-response']",
+        callback_candidates=[],
+    )
+    assert read_sitekey(page, detection) == "6LcRENDERED"  # type: ignore[arg-type]
+
+
 def test_detect_widget_unknown_for_generic(page: object) -> None:
     html = '<div data-sitekey="generic"></div>'
     page.goto(_data_url(html))  # type: ignore[attr-defined]

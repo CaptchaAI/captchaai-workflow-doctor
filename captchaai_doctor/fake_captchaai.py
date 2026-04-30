@@ -71,6 +71,25 @@ class FakeCaptchaAIClient:
     def submit_recaptcha_v2(self, *, sitekey: str, page_url: str) -> SubmitResult:
         return self._submit({"method": "userrecaptcha", "googlekey": sitekey, "pageurl": page_url})
 
+    def submit_recaptcha_v3(
+        self,
+        *,
+        sitekey: str,
+        page_url: str,
+        action: str,
+        min_score: float = 0.3,
+    ) -> SubmitResult:
+        return self._submit(
+            {
+                "method": "userrecaptcha",
+                "googlekey": sitekey,
+                "pageurl": page_url,
+                "version": "v3",
+                "action": action,
+                "min_score": f"{min_score:g}",
+            }
+        )
+
     def get_result(self, captcha_id: str) -> PollResult:
         self.polled.append(captcha_id)
         if self._remaining_not_ready is None:

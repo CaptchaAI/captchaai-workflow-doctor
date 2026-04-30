@@ -61,6 +61,7 @@ RootCause = Literal[
     "browser_action_failed",
     "callback_not_invoked",
     "verification_failed",
+    "recaptcha_v3_action_missing",
     "unknown",
 ]
 
@@ -73,6 +74,14 @@ RootCause = Literal[
 class _CaptchaClientProtocol(Protocol):  # pragma: no cover - structural
     def submit_turnstile(self, *, sitekey: str, page_url: str) -> SubmitResult: ...
     def submit_recaptcha_v2(self, *, sitekey: str, page_url: str) -> SubmitResult: ...
+    def submit_recaptcha_v3(
+        self,
+        *,
+        sitekey: str,
+        page_url: str,
+        action: str,
+        min_score: float = 0.3,
+    ) -> SubmitResult: ...
     def get_result(self, captcha_id: str) -> PollResult: ...
     def get_balance(self) -> float: ...
     def report_bad(self, captcha_id: str) -> None: ...
@@ -128,7 +137,22 @@ def _submit_for(client: _CaptchaClientProtocol, profile: Profile, sitekey: str) 
         return client.submit_turnstile(sitekey=sitekey, page_url=page_url)
     if profile.captcha_type == "recaptcha_v2":
         return client.submit_recaptcha_v2(sitekey=sitekey, page_url=page_url)
+    if profile.captcha_type == "recaptcha_v3":
+        action = profile.detection.action
+        if not action:
+            raise _ProfileMisconfigured(
+                "recaptcha_v3 requires detection.action in the profile (the action name "
+                "the page passes to grecaptcha.execute)"
+            )
+        min_score = profile.detection.min_score if profile.detection.min_score is not None else 0.3
+        return client.submit_recaptcha_v3(
+            sitekey=sitekey, page_url=page_url, action=action, min_score=min_score
+        )
     raise ValueError(f"unsupported captcha_type: {profile.captcha_type}")  # pragma: no cover
+
+
+class _ProfileMisconfigured(RuntimeError):
+    """Raised when the profile lacks fields required for the chosen captcha_type."""
 
 
 def _classify_captchaai_error(exc: CaptchaAIError) -> RootCause:
@@ -280,6 +304,8 @@ def run_workflow(
                     captcha_id,
                     config=profile.captchaai,
                 )
+            except _ProfileMisconfigured as exc:
+                return finalize("failure", "recaptcha_v3_action_missing", str(exc))
             except PollTimeout as exc:
                 return finalize("failure", "poll_timeout", str(exc))
             except CaptchaAINotReadyError:  # pragma: no cover - poller catches this

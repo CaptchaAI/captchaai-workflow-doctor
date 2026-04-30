@@ -124,6 +124,69 @@ SAMPLES: dict[str, RunResult] = {
         action_steps=_base().action_steps[:2],
         screenshots=[],
     ),
+    "recaptcha-v3-success": _base(
+        profile_name="local-demo-form-recaptcha-v3",
+        captcha_type="recaptcha_v3",
+        target_url="http://127.0.0.1:8768/contact",
+        sitekey_found="6LcMOCK_RECAPTCHA_V3_SITEKEY_DEMO",
+        action_steps=[
+            {
+                "type": "fill",
+                "selector": "input[name='name']",
+                "succeeded": True,
+                "detail": None,
+            },
+            {
+                "type": "fill",
+                "selector": "textarea[name='message']",
+                "succeeded": True,
+                "detail": None,
+            },
+            {
+                "type": "inject_token",
+                "selector": "input[name='g-recaptcha-response']",
+                "succeeded": True,
+                "detail": None,
+            },
+            {"type": "wait", "selector": None, "succeeded": True, "detail": None},
+            {
+                "type": "click",
+                "selector": "button[type='submit']",
+                "succeeded": True,
+                "detail": None,
+            },
+        ],
+    ),
+    "recaptcha-v3-action-missing": _base(
+        profile_name="local-demo-form-recaptcha-v3",
+        captcha_type="recaptcha_v3",
+        target_url="http://127.0.0.1:8768/contact",
+        status="failure",
+        root_cause="recaptcha_v3_action_missing",
+        detail=(
+            "recaptcha_v3 requires detection.action in the profile (the action name "
+            "the page passes to grecaptcha.execute)"
+        ),
+        sitekey_found="6LcMOCK_RECAPTCHA_V3_SITEKEY_DEMO",
+        captcha_id_redacted=None,
+        poll_attempts=0,
+        poll_seconds=0.0,
+        action_steps=[
+            {
+                "type": "fill",
+                "selector": "input[name='name']",
+                "succeeded": True,
+                "detail": None,
+            },
+            {
+                "type": "fill",
+                "selector": "textarea[name='message']",
+                "succeeded": True,
+                "detail": None,
+            },
+        ],
+        screenshots=["01-detected.png"],
+    ),
 }
 
 

@@ -244,6 +244,37 @@ def demo_recaptcha_v2(profile_path: str, port: int, headed: bool, artifact_dir: 
     )
 
 
+@demo.command("recaptcha-v3")
+@click.option(
+    "--profile",
+    "profile_path",
+    type=click.Path(exists=True, dir_okay=False),
+    default="profiles/local-demo-form-recaptcha-v3.yaml",
+    show_default=True,
+)
+@click.option(
+    "--port",
+    type=int,
+    default=0,
+    help="Bind the mock app to this port (0 = pick a free one).",
+)
+@click.option("--headed", is_flag=True, default=False)
+@click.option(
+    "--artifact-dir", type=click.Path(file_okay=False), default="run-artifacts/demo-recaptcha-v3"
+)
+def demo_recaptcha_v3(profile_path: str, port: int, headed: bool, artifact_dir: str) -> None:
+    """Boot the local mock reCAPTCHA-v3 contact form and run the workflow against it."""
+    _run_demo(
+        app_module="demos.mock_form_recaptcha_v3.app",
+        profile_path=profile_path,
+        port=port,
+        headed=headed,
+        artifact_dir=artifact_dir,
+        demo_path="/contact",
+        env_overrides={"QA_NAME": "demo-user", "QA_MESSAGE": "hello from doctor"},
+    )
+
+
 def _run_demo(
     *,
     app_module: str,
@@ -251,6 +282,8 @@ def _run_demo(
     port: int,
     headed: bool,
     artifact_dir: str,
+    demo_path: str = "/login",
+    env_overrides: dict[str, str] | None = None,
 ) -> None:
     """Shared runner for ``demo turnstile`` and ``demo recaptcha-v2``."""
     if port == 0:
@@ -270,13 +303,15 @@ def _run_demo(
             raise click.exceptions.Exit(EXIT_WORKFLOW_FAILED)
         os.environ.setdefault("QA_EMAIL", "demo@example.com")
         os.environ.setdefault("QA_PASSWORD", "demo-pass")
+        for k, v in (env_overrides or {}).items():
+            os.environ.setdefault(k, v)
 
         try:
             profile = load_profile(profile_path)
         except ProfileError as exc:
             _err_console.print(f"[red]profile invalid:[/red]\n{exc}")
             raise click.exceptions.Exit(EXIT_PROFILE_ERROR) from exc
-        new_url = f"http://127.0.0.1:{port}/login"
+        new_url = f"http://127.0.0.1:{port}{demo_path}"
         profile = profile.model_copy(
             update={"target": profile.target.model_copy(update={"url": new_url})}
         )

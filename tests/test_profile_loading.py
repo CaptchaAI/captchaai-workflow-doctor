@@ -52,7 +52,7 @@ def test_shipped_profiles_all_load() -> None:
     for f in files:
         profile = load_profile(f)
         assert profile.name
-        assert profile.captcha_type in ("turnstile", "recaptcha_v2")
+        assert profile.captcha_type in ("turnstile", "recaptcha_v2", "recaptcha_v3")
 
 
 def test_minimal_valid_profile(tmp_path: Path) -> None:
@@ -101,7 +101,7 @@ def test_target_host_must_be_in_allowed_domains(tmp_path: Path) -> None:
 
 
 def test_unsupported_captcha_type(tmp_path: Path) -> None:
-    bad = VALID_TURNSTILE_YAML.replace("captcha_type: turnstile", "captcha_type: hcaptcha")
+    bad = VALID_TURNSTILE_YAML.replace("captcha_type: turnstile", "captcha_type: friendly_captcha")
     p = _write(tmp_path, bad)
     with pytest.raises(ProfileError, match="captcha_type"):
         load_profile(p)
