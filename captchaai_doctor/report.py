@@ -58,7 +58,10 @@ REPORT_JSON_SCHEMA: dict[str, Any] = {
     ],
     "properties": {
         "profile_name": {"type": "string", "minLength": 1},
-        "captcha_type": {"type": "string", "enum": ["turnstile", "recaptcha_v2"]},
+        "captcha_type": {
+            "type": "string",
+            "enum": ["turnstile", "recaptcha_v2", "recaptcha_v3"],
+        },
         "target_url": {"type": "string", "format": "uri"},
         "started_at": {"type": "string"},
         "ended_at": {"type": "string"},

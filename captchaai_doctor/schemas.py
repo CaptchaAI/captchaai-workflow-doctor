@@ -31,7 +31,7 @@ from pydantic import (
 # Constants
 # ----------------------------------------------------------------------------
 
-SUPPORTED_CAPTCHA_TYPES: tuple[str, ...] = ("turnstile", "recaptcha_v2")
+SUPPORTED_CAPTCHA_TYPES: tuple[str, ...] = ("turnstile", "recaptcha_v2", "recaptcha_v3")
 
 # Pattern that catches anything that LOOKS like an API key, hex token,
 # session cookie, or password literal. Used by the secret scanner in config.py.
@@ -115,6 +115,12 @@ class Detection(StrictModel):
     sitekey_selector: str | None = None
     response_field_selector: str | None = None
     callback_candidates: list[str] = Field(default_factory=list)
+    # reCAPTCHA v3 only: action name + advisory minimum score.
+    # `action` is sent to CaptchaAI so the worker reproduces the same
+    # action context the page would use; `min_score` is informational
+    # (the solver ignores it but it appears in the report).
+    action: str | None = None
+    min_score: Annotated[float, Field(ge=0.0, le=1.0)] | None = None
 
     @field_validator("sitekey_selector", "response_field_selector")
     @classmethod
@@ -232,7 +238,7 @@ class Failure(StrictModel):
 
 class Profile(StrictModel):
     name: Annotated[str, Field(min_length=1, max_length=120, pattern=r"^[a-zA-Z0-9._\-]+$")]
-    captcha_type: Literal["turnstile", "recaptcha_v2"]
+    captcha_type: Literal["turnstile", "recaptcha_v2", "recaptcha_v3"]
     target: Target
     browser: Browser = Field(default_factory=Browser)
     captchaai: CaptchaAIConfig = Field(default_factory=CaptchaAIConfig)
