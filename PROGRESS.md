@@ -45,12 +45,13 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 2 — CaptchaAI client + poller (mocked)
 
-- [ ] `captchaai_client.submit_challenge`, `poll_result`
-- [ ] `poller.poll_until_ready` with backoff + timeout
-- [ ] `redaction.py` + logging filter (api key / captcha id / token)
-- [ ] Tests for success, NOT_READY→OK, timeout, every documented `ERROR_*`
-- [ ] Logs greppable for raw secrets → zero matches
-- [ ] **Checkpoint**
+- [x] `captchaai_client` submit + result + balance + report-bad with typed error hierarchy
+- [x] `poller.poll_until_ready` with backoff + timeout (deterministic, injectable clock/sleep)
+- [x] `redaction.py` + logging filter (api key / captcha id / token)
+- [x] Tests for success, NOT_READY→OK, timeout, every documented `ERROR_*`
+- [x] Logs greppable for raw secrets → zero matches (asserted by test)
+- [x] Live API smoke (Option B) — `tests/test_live_smoke.py` opt-in via `DOCTOR_ALLOW_REAL_API=1`
+- [x] `scripts/provision-server.sh` + `scripts/run-real-e2e.sh` skeletons (used in Phase 5)
 
 ## Phase 3 — Local Turnstile mock + Playwright runner (walking skeleton)
 
