@@ -106,3 +106,54 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] All plan §25 acceptance criteria checked
 - [x] Tag `v0.1.0`, draft release notes
 - [ ] Flip repo public *(USER ACTION)*
+
+---
+
+## Phase 7 — Multi-CAPTCHA support (v0.2)
+
+### 7a — hCaptcha
+- [ ] `schemas.CaptchaType` extended with `hcaptcha`
+- [ ] `captchaai_client.submit_hcaptcha`
+- [ ] `detector` rule for `div.h-captcha[data-sitekey]`
+- [ ] `runner` dispatch for hCaptcha
+- [ ] `demos/mock_login_hcaptcha/app.py` (port 8767, modes ok/wrong-token/no-callback)
+- [ ] Profiles: `local-demo-login-hcaptcha.yaml`, `hcaptcha-generic.yaml`
+- [ ] CLI `demo hcaptcha`
+- [ ] Tests: client / detector / mock app / e2e / live solve (gated)
+- [ ] Sample report fixture
+- [ ] `report.REPORT_JSON_SCHEMA` enum updated
+- [ ] `demo-smoke.yml` extended
+
+### 7b — reCAPTCHA v3
+- [ ] `schemas.CaptchaType` extended with `recaptcha_v3`
+- [ ] `Detection` model: `action`, `min_score` fields
+- [ ] `captchaai_client.submit_recaptcha_v3`
+- [ ] `detector` rule for `recaptcha.js?render=SITEKEY`
+- [ ] `runner` v3 pipeline branch (verify auto-injected token, fallback `grecaptcha.execute`)
+- [ ] New `RootCause`s `recaptcha_v3_score_low`, `recaptcha_v3_action_mismatch`
+- [ ] `demos/mock_form_recaptcha_v3/app.py` (port 8768)
+- [ ] Profiles: `local-demo-form-recaptcha-v3.yaml`, `recaptcha-v3-generic.yaml`
+- [ ] CLI `demo recaptcha-v3`
+- [ ] Tests: client / detector / mock app / e2e / live solve (gated; mocked-only fallback if no public test pair)
+- [ ] Sample report fixture
+- [ ] `classifier.RECOMMENDATIONS` updated
+
+### 7c — Turnstile invisible
+- [ ] `detector` rule for `div.cf-turnstile[data-size="invisible"]`
+- [ ] `injector` path via `turnstile.execute(widgetId)`
+- [ ] `Detection.turnstile_mode` (`managed | non-interactive | invisible`)
+- [ ] Existing turnstile mock extended with `?widget=invisible`
+- [ ] Tests + sample report fixture
+
+## Phase 8 — Branch protection on `main`
+
+- [x] `.github/CODEOWNERS` (assigns @bshahin)
+- [x] `.github/PULL_REQUEST_TEMPLATE.md` (verification checklist)
+- [x] Ready-to-apply ruleset: `.github/rulesets/protect-main.json` (+ README)
+- [ ] Apply ruleset *(blocked: GitHub free private repos cannot enable branch protection or rulesets — apply right after the user flips the repo public)*
+- [ ] Verify `git push --dry-run --force origin main` is rejected (post-public)
+
+## Release v0.2.0
+
+- [ ] Tag `v0.2.0`
+- [ ] GitHub release notes (hCaptcha + reCAPTCHA v3 + Turnstile invisible + branch protection scaffolding)
