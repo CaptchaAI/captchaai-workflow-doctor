@@ -79,6 +79,10 @@ class DetectedWidget:
     sitekey: str
     selector_matched: str
     sitekey_attribute: str
+    # Turnstile only: "managed" | "non-interactive" | "invisible".
+    # Read from the widget element's `data-size` attribute when present.
+    # ``None`` for non-Turnstile kinds or when the page omits data-size.
+    turnstile_mode: str | None = None
 
 
 def read_sitekey(page: Page, detection: Detection) -> str | None:
@@ -122,8 +126,17 @@ def detect_widget(page: Page) -> DetectedWidget | None:
         sitekey = handle.get_attribute(attr)
         if not sitekey:
             continue
+        turnstile_mode: str | None = None
+        if kind == "turnstile":
+            size = handle.get_attribute("data-size")
+            if size in ("invisible", "compact", "normal", "flexible"):
+                turnstile_mode = "invisible" if size == "invisible" else "managed"
         return DetectedWidget(
-            kind=kind, sitekey=sitekey, selector_matched=selector, sitekey_attribute=attr
+            kind=kind,
+            sitekey=sitekey,
+            selector_matched=selector,
+            sitekey_attribute=attr,
+            turnstile_mode=turnstile_mode,
         )
     # Fall back to reCAPTCHA v3 (no widget div, only a script tag).
     try:
