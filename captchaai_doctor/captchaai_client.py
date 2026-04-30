@@ -233,8 +233,15 @@ class CaptchaAIClient:
         except httpx.HTTPError as exc:
             raise CaptchaAITransportError(f"submit transport error: {exc}") from exc
         data = self._parse_json(resp)
-        captcha_id = data.get("request")
-        if not isinstance(captcha_id, str) or not captcha_id:
+        # CaptchaAI returns the captcha id as either a string or an integer
+        # (production API returns ints for `userrecaptcha`, strings for some
+        # other methods). Coerce to string so downstream code is uniform.
+        raw_id = data.get("request")
+        if isinstance(raw_id, int) and raw_id > 0:
+            captcha_id = str(raw_id)
+        elif isinstance(raw_id, str) and raw_id:
+            captcha_id = raw_id
+        else:
             raise CaptchaAIServerError("BAD_SUBMIT_RESPONSE", f"unexpected payload: {data!r}")
         return SubmitResult(captcha_id=captcha_id)
 

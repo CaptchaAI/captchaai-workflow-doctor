@@ -90,11 +90,11 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `--ci`, `--fail-on`, exit codes per plan §10.6 (already wired in Phase 3, tested in Phase 5)
 - [x] `--no-html` flag for callers that only want JSON
 - [x] `sample-reports/` regenerated from fixtures via `scripts/regenerate_sample_reports.py` (5 samples)
-- [ ] `scripts/provision-server.sh` (idempotent) — deferred (needs infra decision)
-- [ ] `scripts/run-real-e2e.sh` gated by `DOCTOR_ALLOW_REAL_API=1` — deferred (needs infra decision)
-- [ ] First real CaptchaAI solve recorded in `docs/real-e2e-evidence.md` — deferred (needs live API spend approval)
-- [ ] `.github/workflows/demo-smoke.yml`
-- [ ] **Checkpoint**
+- [x] `scripts/provision-server.sh` (idempotent)
+- [x] `scripts/run-real-e2e.sh` gated by `DOCTOR_ALLOW_REAL_API=1` (real-solve tier gated by additional `DOCTOR_ALLOW_REAL_SOLVE=1`)
+- [x] First real CaptchaAI solve recorded in `docs/real-e2e-evidence.md` (2026-05-01: real reCAPTCHA token, 36.82s; bug found + fixed)
+- [x] `.github/workflows/demo-smoke.yml` (full vertical green; uploads artifacts on failure)
+- [x] **Checkpoint**
 
 ## Phase 6 — Docs, article, polish, release
 
