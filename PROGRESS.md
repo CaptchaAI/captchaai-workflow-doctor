@@ -55,12 +55,15 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 3 — Local Turnstile mock + Playwright runner (walking skeleton)
 
-- [ ] `demos/mock-login-turnstile/app.py` (Flask, failure-mode query param)
-- [ ] `cli demo turnstile` boots Flask subprocess
-- [ ] `browser.launch_browser`, `browser.run_actions`
-- [ ] `cli run --mock-captchaai` produces minimal JSON report + screenshots
-- [ ] CI demo-smoke job: full vertical green
-- [ ] **Checkpoint — walking skeleton complete**
+- [x] `demos/mock_login_turnstile/app.py` (Flask, failure-mode query param)
+- [x] `cli demo turnstile` boots Flask subprocess (auto-picks free port; verifies via `/healthz`)
+- [x] `browser.launch_browser`, `browser.run_actions` (Playwright sync)
+- [x] `cli run --mock-captchaai` produces JSON report + screenshots
+- [x] `runner.run_workflow` orchestrates load → navigate → before_solve → submit → poll → after_token → verify
+- [x] `report.write_json_report` (HTML deferred to Phase 5)
+- [x] `fake_captchaai.FakeCaptchaAIClient` (drop-in replacement, deterministic)
+- [x] CI demo-smoke job: full vertical green (`.github/workflows/demo-smoke.yml`)
+- [x] Tests: 6 mock-app, 6 fake-client, 3 e2e (real Chromium)
 
 ## Phase 4 — Detection, injection, verifier, classifier + reCAPTCHA mock
 

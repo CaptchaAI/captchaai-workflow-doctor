@@ -5,6 +5,11 @@
 .env.*
 !.env.example
 
+# --- Runtime artifacts ---
+run-artifacts/
+.playwright/
+.pytest_cache/
+
 # --- Python ---
 __pycache__/
 *.py[cod]
