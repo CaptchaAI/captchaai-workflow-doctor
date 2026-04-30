@@ -40,8 +40,8 @@ jobs:
       - name: Mypy (strict on package)
         run: mypy
 
-      - name: Pytest
-        run: pytest --cov=captchaai_doctor --cov-report=term-missing
+      - name: Pytest (excludes e2e — covered by demo-smoke workflow)
+        run: pytest -m "not e2e" --cov=captchaai_doctor --cov-report=term-missing
 
   secrets-scan:
     runs-on: ubuntu-latest
