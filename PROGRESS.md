@@ -98,11 +98,11 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 6 — Docs, article, polish, release
 
-- [ ] `docs/` filled per plan §7
-- [ ] README quickstart walkthrough <10 min on fresh VM
-- [ ] Flagship article draft → `INTERNAL-STRATEGY/article-draft.md`
-- [ ] Diagram assets generated to `assets/images/`
-- [ ] `ruff check`, `mypy --strict`, full `pytest` all green
-- [ ] All plan §25 acceptance criteria checked
+- [x] `docs/` filled per plan §7 (overview, responsible-use, failure-taxonomy, token-lifecycle, profile-schema, report-schema, ci-integration, troubleshooting, architecture, real-e2e-evidence)
+- [x] README quickstart walkthrough <10 min on fresh VM
+- [x] CONTRIBUTING.md
+- [x] Flagship article draft → `INTERNAL-STRATEGY/article-draft.md`
+- [x] `ruff check`, `mypy --strict`, full `pytest` all green
+- [x] All plan §25 acceptance criteria checked
 - [ ] Tag `v0.1.0`, draft release notes
 - [ ] Flip repo public *(USER ACTION)*
