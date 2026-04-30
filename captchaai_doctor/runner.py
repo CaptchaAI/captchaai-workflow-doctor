@@ -251,12 +251,25 @@ def run_workflow(
 
             sitekey = session.read_sitekey(profile.detection)
             if sitekey is None:
+                # Run the heuristic scan so the report can tell the user
+                # *what* widget (if any) was actually on the page when their
+                # configured selector missed.
+                from captchaai_doctor.detector import detect_widget
+
+                detected = detect_widget(session.page)
                 screenshots.append(session.screenshot(str(artifacts / "01-no-sitekey.png")) or "")
-                return finalize(
-                    "failure",
-                    "sitekey_not_found",
-                    f"no sitekey at selector {profile.detection.sitekey_selector!r}",
-                )
+                if detected is not None:
+                    sitekey_detail = (
+                        f"no sitekey at selector {profile.detection.sitekey_selector!r} "
+                        f"(but the page does expose a {detected.kind!r} widget at "
+                        f"{detected.selector_matched!r}; update detection.sitekey_selector)"
+                    )
+                else:
+                    sitekey_detail = (
+                        f"no sitekey at selector {profile.detection.sitekey_selector!r} "
+                        "(no Turnstile/reCAPTCHA widget detected on the page either)"
+                    )
+                return finalize("failure", "sitekey_not_found", sitekey_detail)
 
             log.info("submitting %s challenge", profile.captcha_type)
             try:
