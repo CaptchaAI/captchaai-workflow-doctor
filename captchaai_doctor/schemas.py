@@ -121,6 +121,12 @@ class Detection(StrictModel):
     # (the solver ignores it but it appears in the report).
     action: str | None = None
     min_score: Annotated[float, Field(ge=0.0, le=1.0)] | None = None
+    # Cloudflare Turnstile only: declares which widget rendering mode
+    # the page uses. Has no runtime effect on the doctor's solving
+    # path (the token is fetched from CaptchaAI either way) but is
+    # surfaced in the report and used by the detector to confirm the
+    # profile matches the live page.
+    turnstile_mode: Literal["managed", "non-interactive", "invisible"] | None = None
 
     @field_validator("sitekey_selector", "response_field_selector")
     @classmethod
