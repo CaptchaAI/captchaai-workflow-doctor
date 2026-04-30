@@ -111,39 +111,39 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 7 — Multi-CAPTCHA support (v0.2)
 
-### 7a — hCaptcha
-- [ ] `schemas.CaptchaType` extended with `hcaptcha`
-- [ ] `captchaai_client.submit_hcaptcha`
-- [ ] `detector` rule for `div.h-captcha[data-sitekey]`
-- [ ] `runner` dispatch for hCaptcha
-- [ ] `demos/mock_login_hcaptcha/app.py` (port 8767, modes ok/wrong-token/no-callback)
-- [ ] Profiles: `local-demo-login-hcaptcha.yaml`, `hcaptcha-generic.yaml`
-- [ ] CLI `demo hcaptcha`
-- [ ] Tests: client / detector / mock app / e2e / live solve (gated)
-- [ ] Sample report fixture
-- [ ] `report.REPORT_JSON_SCHEMA` enum updated
-- [ ] `demo-smoke.yml` extended
+> **PIVOT note:** hCaptcha was dropped after a live probe of `ocr.captchaai.com/in.php`
+> returned `ERROR_SERVER_ERROR` for every method/sitekey combo and the upstream docs
+> confirmed it is not on the supported list. Replaced with **Cloudflare Challenge** in 7c.
 
-### 7b — reCAPTCHA v3
-- [ ] `schemas.CaptchaType` extended with `recaptcha_v3`
-- [ ] `Detection` model: `action`, `min_score` fields
-- [ ] `captchaai_client.submit_recaptcha_v3`
-- [ ] `detector` rule for `recaptcha.js?render=SITEKEY`
-- [ ] `runner` v3 pipeline branch (verify auto-injected token, fallback `grecaptcha.execute`)
-- [ ] New `RootCause`s `recaptcha_v3_score_low`, `recaptcha_v3_action_mismatch`
-- [ ] `demos/mock_form_recaptcha_v3/app.py` (port 8768)
-- [ ] Profiles: `local-demo-form-recaptcha-v3.yaml`, `recaptcha-v3-generic.yaml`
-- [ ] CLI `demo recaptcha-v3`
-- [ ] Tests: client / detector / mock app / e2e / live solve (gated; mocked-only fallback if no public test pair)
-- [ ] Sample report fixture
-- [ ] `classifier.RECOMMENDATIONS` updated
+### 7a — reCAPTCHA v3
+- [x] `schemas.CaptchaType` extended with `recaptcha_v3`
+- [x] `Detection` model: `action`, `min_score` fields
+- [x] `captchaai_client.submit_recaptcha_v3` (method=userrecaptcha + version=v3)
+- [x] `detector` rule for `script[src*='recaptcha'][src*='render=']` (extracts sitekey from `?render=`)
+- [x] `runner` v3 pipeline branch + `_ProfileMisconfigured` mapping
+- [x] New `RootCause` `recaptcha_v3_action_missing` + classifier recommendation
+- [x] `demos/mock_form_recaptcha_v3/app.py` (port 8768; modes ok/wrong-token)
+- [x] Profiles: `local-demo-form-recaptcha-v3.yaml`, `recaptcha-v3-generic.yaml`
+- [x] CLI `demo recaptcha-v3`
+- [x] Tests: client / fake / detector / mock app / e2e (3 cases) — green
+- [x] **Live solve verified** (antcpt.com pair, real ~80-char token in ~5s) — gated test
+- [x] Sample report fixtures (`recaptcha-v3-success`, `recaptcha-v3-action-missing`)
+- [x] `report.REPORT_JSON_SCHEMA` enum updated
+- [x] `demo-smoke.yml` extended
 
-### 7c — Turnstile invisible
+### 7b — Turnstile invisible
 - [ ] `detector` rule for `div.cf-turnstile[data-size="invisible"]`
 - [ ] `injector` path via `turnstile.execute(widgetId)`
 - [ ] `Detection.turnstile_mode` (`managed | non-interactive | invisible`)
 - [ ] Existing turnstile mock extended with `?widget=invisible`
 - [ ] Tests + sample report fixture
+
+### 7c — Cloudflare Challenge (replaces hCaptcha)
+- [ ] Live-probe the exact submit method name on CaptchaAI (likely `cf_clearance`)
+- [ ] `schemas.CaptchaType` extended
+- [ ] `captchaai_client.submit_cloudflare_challenge` + clearance-cookie handling via `context.add_cookies`
+- [ ] Detector rule for the CF interstitial
+- [ ] Mock app, profile, CLI, tests, sample report
 
 ## Phase 8 — Branch protection on `main`
 
@@ -156,4 +156,4 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 ## Release v0.2.0
 
 - [ ] Tag `v0.2.0`
-- [ ] GitHub release notes (hCaptcha + reCAPTCHA v3 + Turnstile invisible + branch protection scaffolding)
+- [ ] GitHub release notes (reCAPTCHA v3 + Turnstile invisible + Cloudflare Challenge + branch protection scaffolding)

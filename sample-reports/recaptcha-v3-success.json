@@ -1,0 +1,51 @@
+{
+  "action_steps": [
+    {
+      "detail": null,
+      "selector": "input[name='name']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "textarea[name='message']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "input[name='g-recaptcha-response']",
+      "succeeded": true,
+      "type": "inject_token"
+    },
+    {
+      "detail": null,
+      "selector": null,
+      "succeeded": true,
+      "type": "wait"
+    },
+    {
+      "detail": null,
+      "selector": "button[type='submit']",
+      "succeeded": true,
+      "type": "click"
+    }
+  ],
+  "captcha_id_redacted": "A1B2****",
+  "captcha_type": "recaptcha_v3",
+  "detail": null,
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 2,
+  "poll_seconds": 4.0,
+  "profile_name": "local-demo-form-recaptcha-v3",
+  "recommendation": "Workflow succeeded. No action required.",
+  "root_cause": "ok",
+  "screenshots": [
+    "03-final.png"
+  ],
+  "sitekey_found": "6LcMOCK_RECAPTCHA_V3_SITEKEY_DEMO",
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "success",
+  "target_url": "http://127.0.0.1:8768/contact"
+}
