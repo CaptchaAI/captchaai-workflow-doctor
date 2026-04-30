@@ -1,0 +1,50 @@
+# Generic Turnstile profile template.
+#
+# Copy this file, rename it, and adjust:
+#   - target.url and allowed_domains for YOUR authorized test page
+#   - selectors to match the page's CAPTCHA widget
+#   - callback_candidates with your page's callback function names
+#
+# NEVER put API keys, passwords, or tokens directly in this file.
+# Use `value_env: NAME` and set NAME in your environment.
+
+name: turnstile-generic
+captcha_type: turnstile
+
+target:
+  url: "https://example.com/login"
+  allowed_domains:
+    - "example.com"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  record_trace: true
+  screenshots: true
+
+captchaai:
+  polling_interval_seconds: 5
+  max_wait_seconds: 120
+
+detection:
+  sitekey_selector: "[data-sitekey]"
+  response_field_selector: "textarea[name='cf-turnstile-response']"
+  callback_candidates: []
+
+actions:
+  before_solve: []
+  after_token:
+    - type: inject_token
+      selector: "textarea[name='cf-turnstile-response']"
+    - type: invoke_callback_if_detected
+    - type: click
+      selector: "button[type='submit']"
+
+success:
+  url_contains:
+    - "/dashboard"
+
+failure:
+  any_text:
+    - "captcha verification failed"
