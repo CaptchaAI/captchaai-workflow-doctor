@@ -32,14 +32,15 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 1 — Profile system + Pydantic schemas
 
-- [ ] `schemas.py` Pydantic v2 models for Profile / Action / Report
-- [ ] `config.load_profile`, `config.validate_profile`
-- [ ] `validate-profile` CLI wired to real validator
-- [ ] `profiles/local-demo-login-turnstile.yaml`
-- [ ] `profiles/local-demo-form-recaptcha-v2.yaml`
-- [ ] `profiles/turnstile-generic.yaml`, `profiles/recaptcha-v2-generic.yaml`
-- [ ] Tests: valid profiles pass; each rule violation fails with actionable message
-- [ ] Tests: secret-shaped strings in YAML rejected
+- [x] `schemas.py` Pydantic v2 models for Profile / Action / Report
+- [x] `config.load_profile`, `config.validate_profile`
+- [x] `validate-profile` CLI wired to real validator
+- [x] `profiles/local-demo-login-turnstile.yaml`
+- [x] `profiles/local-demo-form-recaptcha-v2.yaml`
+- [x] `profiles/turnstile-generic.yaml`, `profiles/recaptcha-v2-generic.yaml`
+- [x] Tests: valid profiles pass; each rule violation fails with actionable message
+- [x] Tests: secret-shaped strings in YAML rejected
+- [x] `docs/profile-schema.md`
 - [ ] **Checkpoint**
 
 ## Phase 2 — CaptchaAI client + poller (mocked)
