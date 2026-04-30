@@ -166,6 +166,53 @@ def demo() -> None:
 )
 def demo_turnstile(profile_path: str, port: int, headed: bool, artifact_dir: str) -> None:
     """Boot the local mock Turnstile login app and run the workflow against it."""
+    _run_demo(
+        app_module="demos.mock_login_turnstile.app",
+        profile_path=profile_path,
+        port=port,
+        headed=headed,
+        artifact_dir=artifact_dir,
+    )
+
+
+@demo.command("recaptcha-v2")
+@click.option(
+    "--profile",
+    "profile_path",
+    type=click.Path(exists=True, dir_okay=False),
+    default="profiles/local-demo-login-recaptcha.yaml",
+    show_default=True,
+)
+@click.option(
+    "--port",
+    type=int,
+    default=0,
+    help="Bind the mock app to this port (0 = pick a free one).",
+)
+@click.option("--headed", is_flag=True, default=False)
+@click.option(
+    "--artifact-dir", type=click.Path(file_okay=False), default="run-artifacts/demo-recaptcha"
+)
+def demo_recaptcha_v2(profile_path: str, port: int, headed: bool, artifact_dir: str) -> None:
+    """Boot the local mock reCAPTCHA-v2-like login app and run the workflow against it."""
+    _run_demo(
+        app_module="demos.mock_login_recaptcha.app",
+        profile_path=profile_path,
+        port=port,
+        headed=headed,
+        artifact_dir=artifact_dir,
+    )
+
+
+def _run_demo(
+    *,
+    app_module: str,
+    profile_path: str,
+    port: int,
+    headed: bool,
+    artifact_dir: str,
+) -> None:
+    """Shared runner for ``demo turnstile`` and ``demo recaptcha-v2``."""
     if port == 0:
         port = _pick_free_port()
     elif not _port_is_free("127.0.0.1", port):
@@ -174,19 +221,16 @@ def demo_turnstile(profile_path: str, port: int, headed: bool, artifact_dir: str
         )
         raise click.exceptions.Exit(EXIT_WORKFLOW_FAILED)
 
-    proc = _spawn_demo_app("demos.mock_login_turnstile.app", port=port)
+    proc = _spawn_demo_app(app_module, port=port)
     try:
         if not _wait_for_healthz("127.0.0.1", port, timeout_seconds=10):
             _err_console.print(
                 f"[red]demo app did not respond on /healthz at 127.0.0.1:{port}[/red]"
             )
             raise click.exceptions.Exit(EXIT_WORKFLOW_FAILED)
-        # Make sure the mock credentials are in the env for the profile actions.
         os.environ.setdefault("QA_EMAIL", "demo@example.com")
         os.environ.setdefault("QA_PASSWORD", "demo-pass")
 
-        # Patch the profile's target.url to the actual port we bound to so the
-        # walking skeleton works with --port 0 and any free-port choice.
         try:
             profile = load_profile(profile_path)
         except ProfileError as exc:
@@ -218,12 +262,6 @@ def demo_turnstile(profile_path: str, port: int, headed: bool, artifact_dir: str
             proc.wait(timeout=5)
         except subprocess.TimeoutExpired:  # pragma: no cover
             proc.kill()
-
-
-@demo.command("recaptcha-v2")
-def demo_recaptcha_v2() -> None:
-    """Start the local reCAPTCHA-v2-like mock app. (stub — Phase 4)"""
-    click.echo("demo recaptcha-v2 (not implemented yet)")
 
 
 def _spawn_demo_app(module: str, *, port: int) -> subprocess.Popen[bytes]:
