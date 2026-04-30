@@ -31,4 +31,11 @@ cd "${REPO_DIR}"
 log "Phase 2 live smoke (getbalance only) ..."
 pytest -q tests/test_live_smoke.py
 
+if [[ "${DOCTOR_ALLOW_REAL_SOLVE:-0}" == "1" ]]; then
+  log "Phase 5 real solve (consumes balance) ..."
+  pytest -q tests/test_live_solve.py
+else
+  log "skipping real-solve test (set DOCTOR_ALLOW_REAL_SOLVE=1 to enable)"
+fi
+
 log "all live tests passed"
