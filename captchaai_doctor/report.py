@@ -60,7 +60,7 @@ REPORT_JSON_SCHEMA: dict[str, Any] = {
         "profile_name": {"type": "string", "minLength": 1},
         "captcha_type": {
             "type": "string",
-            "enum": ["turnstile", "recaptcha_v2", "recaptcha_v3"],
+            "enum": ["turnstile", "recaptcha_v2", "recaptcha_v3", "cloudflare_challenge"],
         },
         "target_url": {"type": "string", "format": "uri"},
         "started_at": {"type": "string"},

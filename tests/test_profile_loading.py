@@ -52,7 +52,12 @@ def test_shipped_profiles_all_load() -> None:
     for f in files:
         profile = load_profile(f)
         assert profile.name
-        assert profile.captcha_type in ("turnstile", "recaptcha_v2", "recaptcha_v3")
+        assert profile.captcha_type in (
+            "turnstile",
+            "recaptcha_v2",
+            "recaptcha_v3",
+            "cloudflare_challenge",
+        )
 
 
 def test_minimal_valid_profile(tmp_path: Path) -> None:

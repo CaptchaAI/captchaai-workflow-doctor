@@ -21,6 +21,7 @@ is produced whether we used the real client or the fake one.
 from __future__ import annotations
 
 import logging
+import os
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -62,6 +63,7 @@ RootCause = Literal[
     "callback_not_invoked",
     "verification_failed",
     "recaptcha_v3_action_missing",
+    "cloudflare_proxy_misconfigured",
     "unknown",
 ]
 
@@ -81,6 +83,17 @@ class _CaptchaClientProtocol(Protocol):  # pragma: no cover - structural
         page_url: str,
         action: str,
         min_score: float = 0.3,
+    ) -> SubmitResult: ...
+    def submit_cloudflare_challenge(
+        self,
+        *,
+        page_url: str,
+        user_agent: str,
+        proxy_host: str,
+        proxy_port: int,
+        proxy_type: str,
+        proxy_username: str | None = None,
+        proxy_password: str | None = None,
     ) -> SubmitResult: ...
     def get_result(self, captcha_id: str) -> PollResult: ...
     def get_balance(self) -> float: ...
@@ -131,13 +144,22 @@ def _redact_id(captcha_id: str | None) -> str | None:
     return f"{captcha_id[:4]}****"
 
 
-def _submit_for(client: _CaptchaClientProtocol, profile: Profile, sitekey: str) -> SubmitResult:
+def _submit_for(
+    client: _CaptchaClientProtocol,
+    profile: Profile,
+    sitekey: str | None,
+    *,
+    env: dict[str, str] | None = None,
+) -> SubmitResult:
     page_url = str(profile.target.url)
     if profile.captcha_type == "turnstile":
+        assert sitekey is not None
         return client.submit_turnstile(sitekey=sitekey, page_url=page_url)
     if profile.captcha_type == "recaptcha_v2":
+        assert sitekey is not None
         return client.submit_recaptcha_v2(sitekey=sitekey, page_url=page_url)
     if profile.captcha_type == "recaptcha_v3":
+        assert sitekey is not None
         action = profile.detection.action
         if not action:
             raise _ProfileMisconfigured(
@@ -147,6 +169,46 @@ def _submit_for(client: _CaptchaClientProtocol, profile: Profile, sitekey: str) 
         min_score = profile.detection.min_score if profile.detection.min_score is not None else 0.3
         return client.submit_recaptcha_v3(
             sitekey=sitekey, page_url=page_url, action=action, min_score=min_score
+        )
+    if profile.captcha_type == "cloudflare_challenge":
+        proxy = profile.proxy
+        # Validator guarantees this, but type checkers don't know that.
+        assert proxy is not None, "cloudflare_challenge profile must declare a proxy"
+        env_map = env if env is not None else dict(os.environ)
+        username: str | None = None
+        password: str | None = None
+        if proxy.username_env or proxy.password_env:
+            assert proxy.username_env and proxy.password_env  # validator pairing
+            username = env_map.get(proxy.username_env)
+            password = env_map.get(proxy.password_env)
+            if not username or not password:
+                missing = [
+                    name
+                    for name, val in (
+                        (proxy.username_env, username),
+                        (proxy.password_env, password),
+                    )
+                    if not val
+                ]
+                raise _ProfileMisconfigured(
+                    f"cloudflare_challenge proxy credentials missing from environment: {missing}"
+                )
+        # Cloudflare ties the cookie to the User-Agent the worker used. We
+        # tell CaptchaAI which UA we will replay from the browser; on the
+        # apply side we set the same UA via page.set_extra_http_headers.
+        user_agent = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        )
+        return client.submit_cloudflare_challenge(
+            page_url=page_url,
+            user_agent=user_agent,
+            proxy_host=proxy.host,
+            proxy_port=proxy.port,
+            proxy_type=proxy.type,
+            proxy_username=username,
+            proxy_password=password,
         )
     raise ValueError(f"unsupported captcha_type: {profile.captcha_type}")  # pragma: no cover
 
@@ -274,7 +336,7 @@ def run_workflow(
                     return finalize("failure", _classify_browser_error(exc), str(exc))
 
             sitekey = session.read_sitekey(profile.detection)
-            if sitekey is None:
+            if sitekey is None and profile.captcha_type != "cloudflare_challenge":
                 # Run the heuristic scan so the report can tell the user
                 # *what* widget (if any) was actually on the page when their
                 # configured selector missed.
@@ -305,7 +367,12 @@ def run_workflow(
                     config=profile.captchaai,
                 )
             except _ProfileMisconfigured as exc:
-                return finalize("failure", "recaptcha_v3_action_missing", str(exc))
+                misconfig_cause: RootCause = (
+                    "cloudflare_proxy_misconfigured"
+                    if profile.captcha_type == "cloudflare_challenge"
+                    else "recaptcha_v3_action_missing"
+                )
+                return finalize("failure", misconfig_cause, str(exc))
             except PollTimeout as exc:
                 return finalize("failure", "poll_timeout", str(exc))
             except CaptchaAINotReadyError:  # pragma: no cover - poller catches this

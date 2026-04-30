@@ -11,6 +11,7 @@ any CI runner with zero credentials and zero spend.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from typing import Final
 
@@ -22,6 +23,24 @@ from captchaai_doctor.captchaai_client import (
 
 #: Token that the mock Flask apps in :mod:`demos` accept as valid.
 FAKE_OK_TOKEN: Final[str] = "FAKE_TOKEN_OK"
+
+#: Cookie value the mock Cloudflare-challenge demo accepts as valid clearance.
+FAKE_CF_CLEARANCE: Final[str] = "FAKE_OK_CLEARANCE"
+
+#: Default User-Agent paired with :data:`FAKE_CF_CLEARANCE`. The mock CF demo
+#: rejects clearance cookies that arrive with a different UA, mirroring the
+#: real Cloudflare binding.
+FAKE_CF_USER_AGENT: Final[str] = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
+
+
+def fake_cf_clearance_payload(
+    *, cookie: str = FAKE_CF_CLEARANCE, user_agent: str = FAKE_CF_USER_AGENT
+) -> str:
+    """Return the JSON shape ``submit_cloudflare_challenge`` callers expect."""
+    return json.dumps({"cookies": {"cf_clearance": cookie}, "userAgent": user_agent})
 
 
 @dataclass
@@ -90,6 +109,31 @@ class FakeCaptchaAIClient:
             }
         )
 
+    def submit_cloudflare_challenge(
+        self,
+        *,
+        page_url: str,
+        user_agent: str,
+        proxy_host: str,
+        proxy_port: int,
+        proxy_type: str,
+        proxy_username: str | None = None,
+        proxy_password: str | None = None,
+    ) -> SubmitResult:
+        if proxy_username and proxy_password:
+            proxy_value = f"{proxy_username}:{proxy_password}@{proxy_host}:{proxy_port}"
+        else:
+            proxy_value = f"{proxy_host}:{proxy_port}"
+        return self._submit(
+            {
+                "method": "cloudflare_challenge",
+                "pageurl": page_url,
+                "userAgent": user_agent,
+                "proxy": proxy_value,
+                "proxytype": proxy_type.upper(),
+            }
+        )
+
     def get_result(self, captcha_id: str) -> PollResult:
         self.polled.append(captcha_id)
         if self._remaining_not_ready is None:
@@ -119,7 +163,10 @@ def make_fake_client(
 
 
 __all__ = [
+    "FAKE_CF_CLEARANCE",
+    "FAKE_CF_USER_AGENT",
     "FAKE_OK_TOKEN",
     "FakeCaptchaAIClient",
+    "fake_cf_clearance_payload",
     "make_fake_client",
 ]
