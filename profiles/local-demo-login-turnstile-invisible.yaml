@@ -1,0 +1,60 @@
+name: local-demo-login-turnstile-invisible
+captcha_type: turnstile
+
+# Same mock app as managed Turnstile, but rendered with
+# `data-size="invisible"`. The doctor's solving path is identical
+# (token comes from CaptchaAI; we inject it + invoke the callback).
+# What changes is the DETECTION confirms the page is in invisible mode
+# and the report records `turnstile_mode: invisible` so the user can
+# see we matched the right rendering shape.
+
+target:
+  url: "http://127.0.0.1:8765/login?widget=invisible"
+  allowed_domains:
+    - "127.0.0.1"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  screenshots: true
+
+captchaai:
+  polling_interval_seconds: 5
+  max_wait_seconds: 120
+
+detection:
+  sitekey_selector: "[data-sitekey]"
+  response_field_selector: "textarea[name='cf-turnstile-response']"
+  callback_candidates:
+    - "onTurnstileSuccess"
+    - "turnstileCallback"
+  turnstile_mode: invisible
+
+actions:
+  before_solve:
+    - type: fill
+      selector: "input[name='email']"
+      value_env: "QA_EMAIL"
+    - type: fill
+      selector: "input[name='password']"
+      value_env: "QA_PASSWORD"
+
+  after_token:
+    - type: inject_token
+      selector: "textarea[name='cf-turnstile-response']"
+    - type: invoke_callback_if_detected
+    - type: wait
+      milliseconds: 200
+    - type: click
+      selector: "button[type='submit']"
+
+success:
+  any_selector:
+    - "[data-testid='dashboard']"
+  url_contains:
+    - "/dashboard"
+
+failure:
+  any_text:
+    - "captcha verification failed"

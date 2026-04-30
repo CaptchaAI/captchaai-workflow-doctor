@@ -132,11 +132,14 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `demo-smoke.yml` extended
 
 ### 7b — Turnstile invisible
-- [ ] `detector` rule for `div.cf-turnstile[data-size="invisible"]`
-- [ ] `injector` path via `turnstile.execute(widgetId)`
-- [ ] `Detection.turnstile_mode` (`managed | non-interactive | invisible`)
-- [ ] Existing turnstile mock extended with `?widget=invisible`
-- [ ] Tests + sample report fixture
+- [x] `detector` rule for `div.cf-turnstile[data-size="invisible"]` (exposed as `DetectedWidget.turnstile_mode`)
+- [~] `injector` path via `turnstile.execute(widgetId)` — *deferred: existing `inject_token` + `invoke_callback_if_detected` path already covers invisible mode (the doctor gets the token from CaptchaAI, so it doesn't need to invoke the widget). The mock exposes a `window.turnstile.execute` shim for completeness.*
+- [x] `Detection.turnstile_mode` (`managed | non-interactive | invisible`)
+- [x] Existing turnstile mock extended with `?widget=invisible` (data-size + execute shim)
+- [x] CLI `demo turnstile-invisible` + profile `local-demo-login-turnstile-invisible.yaml`
+- [x] Tests: 3 mock-app + 3 detector + 2 e2e — green
+- [x] Sample report fixture (`turnstile-invisible-success`)
+- [x] `demo-smoke.yml` extended
 
 ### 7c — Cloudflare Challenge (replaces hCaptcha)
 - [ ] Live-probe the exact submit method name on CaptchaAI (likely `cf_clearance`)

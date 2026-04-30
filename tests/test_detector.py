@@ -69,6 +69,25 @@ def test_detect_widget_classifies_turnstile(page: object) -> None:
     assert widget is not None
     assert widget.kind == "turnstile"
     assert widget.sitekey == "0xABC"
+    assert widget.turnstile_mode is None
+
+
+def test_detect_widget_classifies_turnstile_invisible(page: object) -> None:
+    html = '<div class="cf-turnstile" data-sitekey="0xINV" data-size="invisible"></div>'
+    page.goto(_data_url(html))  # type: ignore[attr-defined]
+    widget = detect_widget(page)  # type: ignore[arg-type]
+    assert widget is not None
+    assert widget.kind == "turnstile"
+    assert widget.sitekey == "0xINV"
+    assert widget.turnstile_mode == "invisible"
+
+
+def test_detect_widget_classifies_turnstile_managed(page: object) -> None:
+    html = '<div class="cf-turnstile" data-sitekey="0xMNG" data-size="normal"></div>'
+    page.goto(_data_url(html))  # type: ignore[attr-defined]
+    widget = detect_widget(page)  # type: ignore[arg-type]
+    assert widget is not None
+    assert widget.turnstile_mode == "managed"
 
 
 def test_detect_widget_classifies_recaptcha(page: object) -> None:
