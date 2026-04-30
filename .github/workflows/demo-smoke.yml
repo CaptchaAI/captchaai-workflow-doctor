@@ -38,13 +38,19 @@ jobs:
         env:
           QA_EMAIL: demo@example.com
           QA_PASSWORD: demo-pass
-        run: pytest -q tests/test_runner_e2e.py
+        run: pytest -q -m e2e
 
-      - name: Run CLI demo end-to-end
+      - name: Run CLI Turnstile demo end-to-end
         env:
           QA_EMAIL: demo@example.com
           QA_PASSWORD: demo-pass
-        run: captchaai-doctor demo turnstile --artifact-dir run-artifacts/ci-demo
+        run: captchaai-doctor demo turnstile --artifact-dir run-artifacts/ci-demo-turnstile
+
+      - name: Run CLI reCAPTCHA-v2 demo end-to-end
+        env:
+          QA_EMAIL: demo@example.com
+          QA_PASSWORD: demo-pass
+        run: captchaai-doctor demo recaptcha-v2 --artifact-dir run-artifacts/ci-demo-recaptcha
 
       - name: Upload artifacts on failure
         if: always()
