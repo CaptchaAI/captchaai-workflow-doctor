@@ -187,6 +187,11 @@ SAMPLES: dict[str, RunResult] = {
         ],
         screenshots=["01-detected.png"],
     ),
+    "turnstile-invisible-success": _base(
+        profile_name="local-demo-login-turnstile-invisible",
+        captcha_type="turnstile",
+        target_url="http://127.0.0.1:8765/login?widget=invisible",
+    ),
 }
 
 

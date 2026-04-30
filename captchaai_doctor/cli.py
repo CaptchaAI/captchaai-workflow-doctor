@@ -215,6 +215,38 @@ def demo_turnstile(profile_path: str, port: int, headed: bool, artifact_dir: str
     )
 
 
+@demo.command("turnstile-invisible")
+@click.option(
+    "--profile",
+    "profile_path",
+    type=click.Path(exists=True, dir_okay=False),
+    default="profiles/local-demo-login-turnstile-invisible.yaml",
+    show_default=True,
+)
+@click.option(
+    "--port",
+    type=int,
+    default=0,
+    help="Bind the mock app to this port (0 = pick a free one).",
+)
+@click.option("--headed", is_flag=True, default=False)
+@click.option(
+    "--artifact-dir",
+    type=click.Path(file_okay=False),
+    default="run-artifacts/demo-turnstile-invisible",
+)
+def demo_turnstile_invisible(profile_path: str, port: int, headed: bool, artifact_dir: str) -> None:
+    """Boot the local mock Turnstile login app in invisible mode and run the workflow."""
+    _run_demo(
+        app_module="demos.mock_login_turnstile.app",
+        profile_path=profile_path,
+        port=port,
+        headed=headed,
+        artifact_dir=artifact_dir,
+        demo_path="/login?widget=invisible",
+    )
+
+
 @demo.command("recaptcha-v2")
 @click.option(
     "--profile",

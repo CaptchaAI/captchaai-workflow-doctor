@@ -78,3 +78,31 @@ def test_healthz(client) -> None:  # type: ignore[no-untyped-def]
     resp = client.get("/healthz")
     assert resp.status_code == 200
     assert resp.data == b"ok"
+
+
+def test_invisible_widget_renders_data_size_and_execute_shim(client) -> None:  # type: ignore[no-untyped-def]
+    resp = client.get("/login?widget=invisible")
+    body = resp.data.decode()
+    assert 'data-size="invisible"' in body
+    assert "window.turnstile = {" in body
+    assert "execute" in body
+
+
+def test_managed_widget_omits_invisible_attrs(client) -> None:  # type: ignore[no-untyped-def]
+    resp = client.get("/login")
+    body = resp.data.decode()
+    assert 'data-size="invisible"' not in body
+    assert "window.turnstile = {" not in body
+
+
+def test_invisible_widget_full_login_succeeds(client) -> None:  # type: ignore[no-untyped-def]
+    resp = client.post(
+        "/login?widget=invisible",
+        data={
+            "email": DEMO_EMAIL,
+            "password": DEMO_PASSWORD,
+            "cf-turnstile-response": FAKE_OK_TOKEN,
+        },
+    )
+    assert resp.status_code == 200
+    assert b'data-testid="dashboard"' in resp.data

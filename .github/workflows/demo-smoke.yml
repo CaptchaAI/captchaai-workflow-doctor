@@ -58,6 +58,12 @@ jobs:
           QA_MESSAGE: hello from ci
         run: captchaai-doctor demo recaptcha-v3 --artifact-dir run-artifacts/ci-demo-recaptcha-v3
 
+      - name: Run CLI Turnstile-invisible demo end-to-end
+        env:
+          QA_EMAIL: demo@example.com
+          QA_PASSWORD: demo-pass
+        run: captchaai-doctor demo turnstile-invisible --artifact-dir run-artifacts/ci-demo-turnstile-invisible
+
       - name: Upload artifacts on failure
         if: always()
         uses: actions/upload-artifact@v4

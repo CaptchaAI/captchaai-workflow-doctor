@@ -37,6 +37,7 @@ FAKE_OK_TOKEN: Final[str] = "FAKE_TOKEN_OK"
 DEMO_SITEKEY: Final[str] = "0xMOCK_SITEKEY_DEMO"
 
 VALID_MODES: Final[frozenset[str]] = frozenset({"ok", "wrong-token", "no-callback"})
+VALID_WIDGETS: Final[frozenset[str]] = frozenset({"managed", "invisible"})
 
 
 _LOGIN_HTML = """\
@@ -49,10 +50,11 @@ _LOGIN_HTML = """\
   <body>
     <h1>Mock Login</h1>
     {% if error %}<p class="error">{{ error }}</p>{% endif %}
-    <form method="post" action="{{ url_for('login') }}?mode={{ mode }}">
+    <form method="post" action="{{ url_for('login') }}?mode={{ mode }}&widget={{ widget }}">
       <label>Email <input name="email" type="email" required></label><br>
       <label>Password <input name="password" type="password" required></label><br>
-      <div id="cf-turnstile" data-sitekey="{{ sitekey }}"></div>
+      <div id="cf-turnstile" data-sitekey="{{ sitekey }}"
+           {% if widget == "invisible" %}data-size="invisible"{% endif %}></div>
       <textarea name="cf-turnstile-response" hidden></textarea>
       <button type="submit">Sign in</button>
     </form>
@@ -66,6 +68,23 @@ _LOGIN_HTML = """\
       window.onTurnstileSuccess = function (token) {
         var el = document.querySelector('textarea[name="cf-turnstile-response"]');
         if (el) { el.value = token; }
+      };
+      {% endif %}
+
+      // Invisible widget shim. Real Turnstile invisible mode exposes
+      // `window.turnstile.execute(widgetId)` which fires the callback
+      // registered through `turnstile.render(...)`. The doctor never
+      // calls this (it gets the token from CaptchaAI), but we expose
+      // it so detector tests can confirm the page advertises invisible
+      // mode end-to-end.
+      {% if widget == "invisible" %}
+      window.turnstile = {
+        render: function (el, opts) { return "mock-widget-1"; },
+        execute: function (widgetId) {
+          if (typeof window.onTurnstileSuccess === "function") {
+            window.onTurnstileSuccess("FAKE_TOKEN_OK");
+          }
+        }
       };
       {% endif %}
     </script>
@@ -92,6 +111,11 @@ def _resolve_mode() -> str:
     return mode if mode in VALID_MODES else "ok"
 
 
+def _resolve_widget() -> str:
+    widget = (request.args.get("widget") or "managed").strip().lower()
+    return widget if widget in VALID_WIDGETS else "managed"
+
+
 def create_app() -> Flask:
     """Build the Flask app instance. Safe to call multiple times in tests."""
     app = Flask(__name__)
@@ -104,8 +128,11 @@ def create_app() -> Flask:
     @app.route("/login", methods=["GET", "POST"])
     def login() -> str:
         mode = _resolve_mode()
+        widget = _resolve_widget()
         if request.method == "GET":
-            return render_template_string(_LOGIN_HTML, error=None, sitekey=DEMO_SITEKEY, mode=mode)
+            return render_template_string(
+                _LOGIN_HTML, error=None, sitekey=DEMO_SITEKEY, mode=mode, widget=widget
+            )
 
         email = (request.form.get("email") or "").strip()
         password = request.form.get("password") or ""
@@ -118,6 +145,7 @@ def create_app() -> Flask:
                 error="captcha verification failed",
                 sitekey=DEMO_SITEKEY,
                 mode=mode,
+                widget=widget,
             )
 
         if email != DEMO_EMAIL or password != DEMO_PASSWORD:
@@ -126,6 +154,7 @@ def create_app() -> Flask:
                 error="invalid credentials",
                 sitekey=DEMO_SITEKEY,
                 mode=mode,
+                widget=widget,
             )
 
         return render_template_string(_DASHBOARD_HTML, email=email)
