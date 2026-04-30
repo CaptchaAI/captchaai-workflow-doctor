@@ -3,8 +3,17 @@
 from __future__ import annotations
 
 import click
+from rich.console import Console
 
 from captchaai_doctor import __version__
+from captchaai_doctor.config import ProfileError, load_profile
+
+# Exit codes per docs/profile-schema.md (mirrors plan §10.6).
+EXIT_OK = 0
+EXIT_WORKFLOW_FAILED = 1
+EXIT_PROFILE_ERROR = 2
+
+_err_console = Console(stderr=True)
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -16,9 +25,13 @@ def main() -> None:
 @main.command("validate-profile")
 @click.argument("profile_path", type=click.Path(exists=True, dir_okay=False))
 def validate_profile(profile_path: str) -> None:
-    """Validate a workflow profile YAML against the schema. (stub — Phase 1)"""
-    click.echo(f"validate-profile: {profile_path} (not implemented yet)")
-    raise click.exceptions.Exit(0)
+    """Validate a workflow profile YAML against the schema."""
+    try:
+        profile = load_profile(profile_path)
+    except ProfileError as exc:
+        _err_console.print(f"[red]profile invalid:[/red]\n{exc}")
+        raise click.exceptions.Exit(EXIT_PROFILE_ERROR) from exc
+    click.echo(f"OK: {profile.name} ({profile.captcha_type}) -> {profile.target.url}")
 
 
 @main.command("run")
