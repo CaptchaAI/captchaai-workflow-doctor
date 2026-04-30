@@ -104,5 +104,5 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] Flagship article draft → `INTERNAL-STRATEGY/article-draft.md`
 - [x] `ruff check`, `mypy --strict`, full `pytest` all green
 - [x] All plan §25 acceptance criteria checked
-- [ ] Tag `v0.1.0`, draft release notes
+- [x] Tag `v0.1.0`, draft release notes
 - [ ] Flip repo public *(USER ACTION)*
