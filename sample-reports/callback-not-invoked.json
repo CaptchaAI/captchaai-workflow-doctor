@@ -1,0 +1,45 @@
+{
+  "action_steps": [
+    {
+      "detail": null,
+      "selector": "input[name='email']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "input[name='password']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "textarea[name='cf-turnstile-response']",
+      "succeeded": true,
+      "type": "inject_token"
+    },
+    {
+      "detail": "none of the callback candidates were defined on the page",
+      "selector": null,
+      "succeeded": false,
+      "type": "invoke_callback_if_detected"
+    }
+  ],
+  "captcha_id_redacted": "A1B2****",
+  "captcha_type": "turnstile",
+  "detail": "none of the callback candidates were defined on the page: ['onTurnstileSuccess', 'turnstileCallback']",
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 2,
+  "poll_seconds": 4.0,
+  "profile_name": "local-demo-login-turnstile",
+  "recommendation": "None of the JS callback candidates were defined on the page when we tried to invoke them. Update detection.callback_candidates with the real callback name from the page.",
+  "root_cause": "callback_not_invoked",
+  "screenshots": [
+    "03-final.png"
+  ],
+  "sitekey_found": "0xMOCK_SITEKEY_DEMO",
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "failure",
+  "target_url": "http://127.0.0.1:8765/login"
+}

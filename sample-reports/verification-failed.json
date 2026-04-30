@@ -1,0 +1,57 @@
+{
+  "action_steps": [
+    {
+      "detail": null,
+      "selector": "input[name='email']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "input[name='password']",
+      "succeeded": true,
+      "type": "fill"
+    },
+    {
+      "detail": null,
+      "selector": "textarea[name='cf-turnstile-response']",
+      "succeeded": true,
+      "type": "inject_token"
+    },
+    {
+      "detail": null,
+      "selector": null,
+      "succeeded": true,
+      "type": "invoke_callback_if_detected"
+    },
+    {
+      "detail": null,
+      "selector": null,
+      "succeeded": true,
+      "type": "wait"
+    },
+    {
+      "detail": null,
+      "selector": "button[type='submit']",
+      "succeeded": true,
+      "type": "click"
+    }
+  ],
+  "captcha_id_redacted": "A1B2****",
+  "captcha_type": "turnstile",
+  "detail": "failure text matched: 'captcha verification failed'",
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 2,
+  "poll_seconds": 4.0,
+  "profile_name": "local-demo-login-turnstile",
+  "recommendation": "The token was injected but the server still rejected the submission. Confirm the response field name and that the form's POST includes it.",
+  "root_cause": "verification_failed",
+  "screenshots": [
+    "03-final.png"
+  ],
+  "sitekey_found": "0xMOCK_SITEKEY_DEMO",
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "failure",
+  "target_url": "http://127.0.0.1:8765/login"
+}
