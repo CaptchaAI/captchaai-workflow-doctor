@@ -1,0 +1,27 @@
+{
+  "action_steps": [
+    {
+      "detail": null,
+      "selector": null,
+      "succeeded": true,
+      "type": "apply_clearance_cookie"
+    }
+  ],
+  "captcha_id_redacted": "A1B2****",
+  "captcha_type": "cloudflare_challenge",
+  "detail": null,
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 2,
+  "poll_seconds": 4.0,
+  "profile_name": "local-demo-cloudflare-challenge",
+  "recommendation": "Workflow succeeded. No action required.",
+  "root_cause": "ok",
+  "screenshots": [
+    "03-final.png"
+  ],
+  "sitekey_found": null,
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "success",
+  "target_url": "http://127.0.0.1:8769/protected"
+}

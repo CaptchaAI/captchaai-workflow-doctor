@@ -1,0 +1,54 @@
+name: local-demo-cloudflare-challenge
+captcha_type: cloudflare_challenge
+
+target:
+  url: "http://127.0.0.1:8769/protected"
+  allowed_domains:
+    - "127.0.0.1"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  record_trace: true
+  screenshots: true
+
+captchaai:
+  submit_endpoint: "https://ocr.captchaai.com/in.php"
+  result_endpoint: "https://ocr.captchaai.com/res.php"
+  polling_interval_seconds: 5
+  max_wait_seconds: 240
+
+# Cloudflare Challenge has no widget div / sitekey / response field.
+# The clearance is a cookie applied by the `apply_clearance_cookie` action.
+detection:
+  sitekey_selector: null
+  response_field_selector: null
+  callback_candidates: []
+
+# A proxy is REQUIRED for cloudflare_challenge: the cf_clearance cookie is
+# bound to the IP that solved the challenge, so the CaptchaAI worker and
+# your browser must egress through the same network. For the local demo
+# the mock app does not actually verify IP, but the runner still requires
+# the block so the contract is identical to production.
+proxy:
+  type: "HTTP"
+  host: "127.0.0.1"
+  port: 18080
+  # The local demo does not enforce credentials; comment these out unless
+  # your provider requires them. Both must be set or both omitted.
+  # username_env: "DOCTOR_PROXY_USER"
+  # password_env: "DOCTOR_PROXY_PASS"
+
+actions:
+  before_solve: []
+  after_token:
+    - type: apply_clearance_cookie
+
+success:
+  any_selector:
+    - "[data-testid='protected']"
+
+failure:
+  any_selector:
+    - "[data-testid='cf-interstitial']"

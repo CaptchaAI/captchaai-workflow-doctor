@@ -142,11 +142,43 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `demo-smoke.yml` extended
 
 ### 7c — Cloudflare Challenge (replaces hCaptcha)
-- [ ] Live-probe the exact submit method name on CaptchaAI (likely `cf_clearance`)
-- [ ] `schemas.CaptchaType` extended
-- [ ] `captchaai_client.submit_cloudflare_challenge` + clearance-cookie handling via `context.add_cookies`
-- [ ] Detector rule for the CF interstitial
-- [ ] Mock app, profile, CLI, tests, sample report
+- [x] Live-probe the exact submit method name on CaptchaAI: confirmed
+      `method=cloudflare_challenge` with REQUIRED params
+      `pageurl`, `userAgent`, `proxy` (host:port or user:pass@host:port),
+      `proxytype` (HTTP/HTTPS/SOCKS4/SOCKS5). Submit accepts; result
+      shape is `cf_clearance` cookie + matching User-Agent that must be
+      replayed from the same egress IP.
+- [x] `schemas`: `captcha_type` literal extended; new `Proxy` model;
+      new `ApplyClearanceCookieAction`; cross-field validator forces
+      `proxy:` when `captcha_type=cloudflare_challenge`.
+- [x] `captchaai_client.submit_cloudflare_challenge` + matching
+      `FakeCaptchaAIClient.submit_cloudflare_challenge` +
+      `fake_cf_clearance_payload()` helper.
+- [x] `runner._submit_for` dispatches CF, resolves proxy creds from env,
+      reports new `cloudflare_proxy_misconfigured` root cause when env
+      vars are missing.
+- [x] `browser._apply_clearance_cookie` parses the JSON token, sets
+      `cf_clearance` via `context.add_cookies`, replays the UA via
+      `page.set_extra_http_headers`, and reloads the page.
+- [x] Detector heuristic for the CF interstitial
+      (`script[src*='challenges.cloudflare.com']`, `#cf-challenge-running`,
+      etc.); new `cloudflare_challenge` `CaptchaKind`.
+- [x] Mock app `demos/mock_cloudflare_challenge` (port 8769) — serves a
+      403 interstitial unless cookie + matching UA are presented.
+- [x] Profiles: `local-demo-cloudflare-challenge.yaml` +
+      `cloudflare-challenge-generic.yaml`.
+- [x] CLI: `captchaai-doctor demo cloudflare-challenge`.
+- [x] Tests: 5 mock-app + 2 client + 4 e2e + 1 classifier extension — green.
+- [x] Sample reports: `cloudflare-challenge-success`,
+      `cloudflare-proxy-misconfigured`.
+- [x] `demo-smoke.yml` extended.
+- [~] Live solve verification: deferred. The CaptchaAI worker requires a
+      real residential proxy (the cookie is bound to the egress IP); we
+      do not have one allocated to this test account. Method name +
+      parameter contract are verified live (submit returns a captcha_id;
+      result returns `ERROR_CAPTCHA_UNSOLVABLE` with a fake proxy, which
+      is the expected failure mode). Live-solve gate stays off until a
+      real proxy is plumbed in.
 
 ## Phase 8 — Branch protection on `main`
 
