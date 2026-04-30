@@ -1,0 +1,56 @@
+name: demo-smoke
+
+# Walking-skeleton end-to-end smoke: boots the local mock Turnstile app
+# and a real Chromium, runs the workflow against it with the fake
+# CaptchaAI client. No external network, no API key, no spend.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: demo-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  demo-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install package + dev deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Install Playwright (chromium + system deps)
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run e2e tests (mock app + Chromium + fake CaptchaAI)
+        env:
+          QA_EMAIL: demo@example.com
+          QA_PASSWORD: demo-pass
+        run: pytest -q tests/test_runner_e2e.py
+
+      - name: Run CLI demo end-to-end
+        env:
+          QA_EMAIL: demo@example.com
+          QA_PASSWORD: demo-pass
+        run: captchaai-doctor demo turnstile --artifact-dir run-artifacts/ci-demo
+
+      - name: Upload artifacts on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-smoke-artifacts
+          path: run-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
