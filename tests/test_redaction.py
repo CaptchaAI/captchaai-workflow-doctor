@@ -15,9 +15,11 @@ def test_redact_hex_api_key() -> None:
 
 
 def test_redact_query_string_key() -> None:
-    out = redact("https://api.example.com/in.php?key=ad0926ac86e0c0157f839e0fe4850bbc&id=12345678")
-    assert "ad0926ac86e0c0157f839e0fe4850bbc" not in out
-    assert "key=ad09****" in out
+    # Synthetic 32-char hex — low-entropy repeating pattern, not a real key.
+    synthetic = "deadbeef" * 4
+    out = redact(f"https://api.example.com/in.php?key={synthetic}&id=12345678")
+    assert synthetic not in out
+    assert "key=dead****" in out
     assert "id=1234****" in out
 
 
@@ -40,24 +42,25 @@ def test_logging_filter_masks_via_root_logger(caplog) -> None:
     # they reach the capture.
     caplog.handler.addFilter(flt)
     log = logging.getLogger("test.redaction")
-    secret = "ad0926ac86e0c0157f839e0fe4850bbc"
+    synthetic_key = "deadbeef" * 4  # low-entropy 32-char hex — not a real key
     with caplog.at_level(logging.INFO):
-        log.info("api call key=%s done", secret)
+        log.info("api call key=%s done", synthetic_key)
     combined = " ".join(rec.getMessage() for rec in caplog.records)
-    assert secret not in combined
+    assert synthetic_key not in combined
 
 
 def test_filter_handles_args_safely() -> None:
     flt = RedactingFilter()
+    synthetic_key = "deadbeef" * 4
     rec = logging.LogRecord(
         name="x",
         level=logging.INFO,
         pathname=__file__,
         lineno=1,
         msg="key=%s",
-        args=("ad0926ac86e0c0157f839e0fe4850bbc",),
+        args=(synthetic_key,),
         exc_info=None,
     )
     flt.filter(rec)
     assert rec.args == ()
-    assert "ad0926ac86e0c0157f839e0fe4850bbc" not in rec.getMessage()
+    assert synthetic_key not in rec.getMessage()
