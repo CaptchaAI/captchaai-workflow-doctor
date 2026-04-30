@@ -307,6 +307,48 @@ def demo_recaptcha_v3(profile_path: str, port: int, headed: bool, artifact_dir: 
     )
 
 
+@demo.command("cloudflare-challenge")
+@click.option(
+    "--profile",
+    "profile_path",
+    type=click.Path(exists=True, dir_okay=False),
+    default="profiles/local-demo-cloudflare-challenge.yaml",
+    show_default=True,
+)
+@click.option(
+    "--port",
+    type=int,
+    default=0,
+    help="Bind the mock app to this port (0 = pick a free one).",
+)
+@click.option("--headed", is_flag=True, default=False)
+@click.option(
+    "--artifact-dir",
+    type=click.Path(file_okay=False),
+    default="run-artifacts/demo-cloudflare-challenge",
+)
+def demo_cloudflare_challenge(
+    profile_path: str, port: int, headed: bool, artifact_dir: str
+) -> None:
+    """Boot the local mock Cloudflare-challenge target and run the workflow against it.
+
+    Uses the in-process fake CaptchaAI client; the fake returns a JSON
+    clearance payload (cf_clearance cookie + matching User-Agent) that the
+    runner replays via the ``apply_clearance_cookie`` action.
+    """
+    from captchaai_doctor.fake_captchaai import fake_cf_clearance_payload
+
+    _run_demo(
+        app_module="demos.mock_cloudflare_challenge.app",
+        profile_path=profile_path,
+        port=port,
+        headed=headed,
+        artifact_dir=artifact_dir,
+        demo_path="/protected",
+        fake_client_token=fake_cf_clearance_payload(),
+    )
+
+
 def _run_demo(
     *,
     app_module: str,
@@ -316,6 +358,7 @@ def _run_demo(
     artifact_dir: str,
     demo_path: str = "/login",
     env_overrides: dict[str, str] | None = None,
+    fake_client_token: str | None = None,
 ) -> None:
     """Shared runner for ``demo turnstile`` and ``demo recaptcha-v2``."""
     if port == 0:
@@ -348,14 +391,13 @@ def _run_demo(
             update={"target": profile.target.model_copy(update={"url": new_url})}
         )
 
-        from captchaai_doctor.fake_captchaai import make_fake_client
+        from captchaai_doctor.fake_captchaai import FAKE_OK_TOKEN, make_fake_client
         from captchaai_doctor.report import write_html_report, write_json_report
         from captchaai_doctor.runner import run_workflow
 
         artifacts = Path(artifact_dir)
-        result = run_workflow(
-            profile, client=make_fake_client(), artifact_dir=artifacts, headed=headed
-        )
+        client = make_fake_client(token=fake_client_token or FAKE_OK_TOKEN)
+        result = run_workflow(profile, client=client, artifact_dir=artifacts, headed=headed)
         write_json_report(result, artifacts / "report.json")
         write_html_report(result, artifacts / "report.html")
         click.echo(f"\nReport: {artifacts / 'report.json'}")

@@ -38,6 +38,7 @@ from captchaai_doctor.injector import (
 )
 from captchaai_doctor.schemas import (
     Action,
+    ApplyClearanceCookieAction,
     ClickAction,
     Detection,
     FillAction,
@@ -178,6 +179,17 @@ class BrowserSession:
                 )
             return
 
+        if isinstance(action, ApplyClearanceCookieAction):
+            if token is None:
+                raise BrowserActionError(
+                    "apply_clearance_cookie requires a CAPTCHA token, none was solved yet"
+                )
+            try:
+                _apply_clearance_cookie(self.context, self.page, token)
+            except _ClearanceError as exc:
+                raise BrowserActionError(str(exc)) from exc
+            return
+
         raise BrowserActionError(  # pragma: no cover
             f"unsupported action type: {action.type}"
         )
@@ -202,6 +214,74 @@ class BrowserSession:
 
 def _selector_of(action: Action) -> str | None:
     return getattr(action, "selector", None)
+
+
+class _ClearanceError(Exception):
+    """Internal: raised by :func:`_apply_clearance_cookie` for a clean handoff."""
+
+
+def _apply_clearance_cookie(context: BrowserContext, page: Page, token: str) -> None:
+    """Apply the ``cf_clearance`` cookie + matching UA, then reload.
+
+    ``token`` must be the raw ``request`` field returned by CaptchaAI for a
+    ``cloudflare_challenge`` submission. The expected shape is JSON::
+
+        {"cookies": {"cf_clearance": "<value>"}, "userAgent": "<ua>"}
+
+    The cookie is bound to the IP that solved it, so this only works when
+    the browser's egress matches the CaptchaAI worker's egress (i.e. the
+    same proxy is configured for both).
+    """
+    import json
+    from urllib.parse import urlparse
+
+    try:
+        payload = json.loads(token)
+    except json.JSONDecodeError as exc:
+        raise _ClearanceError(
+            "cloudflare_challenge result was not JSON; expected "
+            "{'cookies': {'cf_clearance': ...}, 'userAgent': ...}"
+        ) from exc
+    if not isinstance(payload, dict):
+        raise _ClearanceError(
+            f"cloudflare_challenge JSON must be an object, got {type(payload).__name__}"
+        )
+    cookies = payload.get("cookies")
+    if not isinstance(cookies, dict) or "cf_clearance" not in cookies:
+        raise _ClearanceError("cloudflare_challenge JSON missing cookies.cf_clearance")
+    cf_value = cookies["cf_clearance"]
+    if not isinstance(cf_value, str) or not cf_value:
+        raise _ClearanceError("cookies.cf_clearance must be a non-empty string")
+    user_agent = payload.get("userAgent")
+    if not isinstance(user_agent, str) or not user_agent:
+        raise _ClearanceError("cloudflare_challenge JSON missing non-empty userAgent")
+
+    parsed = urlparse(page.url)
+    if not parsed.hostname:
+        raise _ClearanceError(f"page url {page.url!r} has no hostname to bind cookie to")
+    # Use a leading-dot domain so the cookie is sent for both the apex and
+    # any subdomain the post-clearance navigation may land on.
+    domain = parsed.hostname
+    cookie_domain = f".{domain}" if not domain.startswith(".") else domain
+    context.add_cookies(
+        [
+            {
+                "name": "cf_clearance",
+                "value": cf_value,
+                "domain": cookie_domain,
+                "path": "/",
+                "httpOnly": True,
+                "secure": parsed.scheme == "https",
+                "sameSite": "None" if parsed.scheme == "https" else "Lax",
+            }
+        ]
+    )
+    # Replay the same UA the worker used; Cloudflare binds the cookie to it.
+    page.set_extra_http_headers({"User-Agent": user_agent})
+    try:
+        page.reload(wait_until="domcontentloaded")
+    except Exception as exc:  # pragma: no cover - defensive
+        raise _ClearanceError(f"reload after applying clearance failed: {exc}") from exc
 
 
 @contextmanager

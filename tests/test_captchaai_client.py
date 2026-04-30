@@ -182,3 +182,58 @@ def test_context_manager_closes(client: CaptchaAIClient) -> None:
     respx.get(RESULT_URL).respond(json={"status": 1, "request": "1"})
     with CaptchaAIClient(api_key=API_KEY) as c:
         c.get_balance()
+
+
+@respx.mock
+def test_submit_cloudflare_challenge_sends_proxy_params(client: CaptchaAIClient) -> None:
+    route = respx.post(SUBMIT_URL).respond(json={"status": 1, "request": "7777"})
+    result = client.submit_cloudflare_challenge(
+        page_url="https://x.test/p",
+        user_agent="Mozilla/5.0 ... Chrome/124.0.0.0",
+        proxy_host="10.0.0.1",
+        proxy_port=8080,
+        proxy_type="HTTP",
+        proxy_username="u",
+        proxy_password="p",
+    )
+    assert result.captcha_id == "7777"
+    body = route.calls.last.request.content.decode()
+    assert "method=cloudflare_challenge" in body
+    assert "proxytype=HTTP" in body
+    assert "u%3Ap%4010.0.0.1%3A8080" in body  # urlencoded user:pass@host:port
+
+
+def test_submit_cloudflare_challenge_validates_args(client: CaptchaAIClient) -> None:
+    with pytest.raises(ValueError, match="user_agent"):
+        client.submit_cloudflare_challenge(
+            page_url="https://x.test",
+            user_agent="  ",
+            proxy_host="h",
+            proxy_port=8080,
+            proxy_type="HTTP",
+        )
+    with pytest.raises(ValueError, match="proxy_port"):
+        client.submit_cloudflare_challenge(
+            page_url="https://x.test",
+            user_agent="ua",
+            proxy_host="h",
+            proxy_port=99999,
+            proxy_type="HTTP",
+        )
+    with pytest.raises(ValueError, match="proxy_type"):
+        client.submit_cloudflare_challenge(
+            page_url="https://x.test",
+            user_agent="ua",
+            proxy_host="h",
+            proxy_port=8080,
+            proxy_type="FTP",
+        )
+    with pytest.raises(ValueError, match="both"):
+        client.submit_cloudflare_challenge(
+            page_url="https://x.test",
+            user_agent="ua",
+            proxy_host="h",
+            proxy_port=8080,
+            proxy_type="HTTP",
+            proxy_username="u",
+        )

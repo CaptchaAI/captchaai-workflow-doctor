@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CaptchaAI Doctor &mdash; local-demo-cloudflare-challenge</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+            sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem;
+            color: #222; }
+    h1 { margin-bottom: 0.25rem; }
+    .meta { color: #555; margin-top: 0; }
+    .badge { color: #fff; padding: 0.15rem 0.6rem; border-radius: 0.4rem;
+              font-size: 0.85rem; letter-spacing: 0.05em; }
+    .grid { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1rem;
+             margin: 1rem 0; }
+    .grid dt { font-weight: 600; color: #444; }
+    .grid dd { margin: 0; }
+    .recommendation { background: #fff8e6; border-left: 4px solid #f0ad4e;
+                       padding: 0.75rem 1rem; border-radius: 0 0.4rem 0.4rem 0; }
+    .steps { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .steps th, .steps td { border-bottom: 1px solid #eee; padding: 0.4rem 0.6rem;
+                            text-align: left; vertical-align: top; }
+    .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 1rem; }
+    .shots figure { margin: 0; }
+    .shots img { max-width: 100%; border: 1px solid #ddd; border-radius: 0.3rem; }
+    .shots figcaption { font-size: 0.85rem; color: #666; }
+    code { background: #f4f4f4; padding: 0.05rem 0.3rem; border-radius: 0.25rem; }
+    section { margin-top: 2rem; }
+    h2 { border-bottom: 1px solid #eee; padding-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <h1>local-demo-cloudflare-challenge <span class="badge" style="background:#b3261e">FAILURE</span></h1>
+  <p class="meta">cloudflare_challenge &middot; <code>http://127.0.0.1:8769/protected</code></p>
+
+  <section>
+    <h2>Summary</h2>
+    <dl class="grid">
+      <dt>Status</dt><dd>failure</dd>
+      <dt>Root cause</dt><dd><code>cloudflare_proxy_misconfigured</code></dd>
+      <dt>Detail</dt><dd>cloudflare_challenge proxy credentials missing from environment: [&#x27;DOCTOR_PROXY_USER&#x27;, &#x27;DOCTOR_PROXY_PASS&#x27;]</dd>
+      <dt>Started</dt><dd>2026-04-30T21:00:00Z</dd>
+      <dt>Ended</dt><dd>2026-04-30T21:00:08Z</dd>
+      <dt>Duration</dt><dd>8.123 s</dd>
+      <dt>Sitekey found</dt><dd><code>—</code></dd>
+      <dt>Captcha ID</dt><dd><code>—</code> (redacted)</dd>
+      <dt>Poll attempts</dt><dd>0</dd>
+      <dt>Poll seconds</dt><dd>0.000</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Recommendation</h2>
+    <p class="recommendation">Profile uses captcha_type=cloudflare_challenge but the proxy block is missing or its credential env vars are unset. Cloudflare binds the cf_clearance cookie to the IP that solved it, so both the CaptchaAI worker and your browser must egress through the same proxy. Add a `proxy:` block and export the username/password env vars.</p>
+  </section>
+
+  <section>
+    <h2>Action timeline</h2>
+    <p><em>No action steps recorded.</em></p>
+  </section>
+
+  <section>
+    <h2>Screenshots</h2>
+    <p><em>No screenshots were captured.</em></p>
+  </section>
+
+  <section>
+    <h2>Raw JSON</h2>
+    <pre><code>{
+  &quot;action_steps&quot;: [],
+  &quot;captcha_id_redacted&quot;: null,
+  &quot;captcha_type&quot;: &quot;cloudflare_challenge&quot;,
+  &quot;detail&quot;: &quot;cloudflare_challenge proxy credentials missing from environment: [&#x27;DOCTOR_PROXY_USER&#x27;, &#x27;DOCTOR_PROXY_PASS&#x27;]&quot;,
+  &quot;duration_seconds&quot;: 8.123,
+  &quot;ended_at&quot;: &quot;2026-04-30T21:00:08Z&quot;,
+  &quot;poll_attempts&quot;: 0,
+  &quot;poll_seconds&quot;: 0.0,
+  &quot;profile_name&quot;: &quot;local-demo-cloudflare-challenge&quot;,
+  &quot;recommendation&quot;: &quot;Profile uses captcha_type=cloudflare_challenge but the proxy block is missing or its credential env vars are unset. Cloudflare binds the cf_clearance cookie to the IP that solved it, so both the CaptchaAI worker and your browser must egress through the same proxy. Add a `proxy:` block and export the username/password env vars.&quot;,
+  &quot;root_cause&quot;: &quot;cloudflare_proxy_misconfigured&quot;,
+  &quot;screenshots&quot;: [],
+  &quot;sitekey_found&quot;: null,
+  &quot;started_at&quot;: &quot;2026-04-30T21:00:00Z&quot;,
+  &quot;status&quot;: &quot;failure&quot;,
+  &quot;target_url&quot;: &quot;http://127.0.0.1:8769/protected&quot;
+}</code></pre>
+  </section>
+</body>
+</html>

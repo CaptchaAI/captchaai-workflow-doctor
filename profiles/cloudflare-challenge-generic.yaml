@@ -1,0 +1,64 @@
+# Generic Cloudflare-Challenge profile template.
+#
+# Cloudflare Challenge ("Just a moment...") works differently from
+# Turnstile / reCAPTCHA: there is no widget div, no sitekey, and no
+# token-injection field. The solver returns a `cf_clearance` cookie +
+# a User-Agent string; both must be replayed by your browser to bypass
+# the interstitial.
+#
+# CRITICAL: the cookie is bound to the IP that solved the challenge.
+# The CaptchaAI worker and your browser MUST egress through the SAME
+# proxy, otherwise Cloudflare will reject the cookie. The `proxy:`
+# block below is REQUIRED for captcha_type=cloudflare_challenge.
+#
+# Copy this file, rename it, and adjust:
+#   - target.url and allowed_domains for YOUR authorized test page
+#   - the proxy block to point at YOUR shared egress
+#   - export DOCTOR_PROXY_USER / DOCTOR_PROXY_PASS in your shell
+#
+# NEVER put proxy credentials directly in this file.
+
+name: cloudflare-challenge-generic
+captcha_type: cloudflare_challenge
+
+target:
+  url: "https://example.com/protected"
+  allowed_domains:
+    - "example.com"
+
+browser:
+  engine: chromium
+  headless: true
+  timeout_ms: 60000
+  screenshots: true
+
+captchaai:
+  polling_interval_seconds: 5
+  max_wait_seconds: 240
+
+detection:
+  sitekey_selector: null
+  response_field_selector: null
+  callback_candidates: []
+
+proxy:
+  type: "HTTP"
+  host: "proxy.example.com"
+  port: 8080
+  username_env: "DOCTOR_PROXY_USER"
+  password_env: "DOCTOR_PROXY_PASS"
+
+actions:
+  before_solve: []
+  after_token:
+    - type: apply_clearance_cookie
+
+success:
+  any_selector:
+    - "main"
+  url_contains:
+    - "/protected"
+
+failure:
+  any_text:
+    - "Just a moment"

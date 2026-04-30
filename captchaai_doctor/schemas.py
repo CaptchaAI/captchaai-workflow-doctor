@@ -31,7 +31,12 @@ from pydantic import (
 # Constants
 # ----------------------------------------------------------------------------
 
-SUPPORTED_CAPTCHA_TYPES: tuple[str, ...] = ("turnstile", "recaptcha_v2", "recaptcha_v3")
+SUPPORTED_CAPTCHA_TYPES: tuple[str, ...] = (
+    "turnstile",
+    "recaptcha_v2",
+    "recaptcha_v3",
+    "cloudflare_challenge",
+)
 
 # Pattern that catches anything that LOOKS like an API key, hex token,
 # session cookie, or password literal. Used by the secret scanner in config.py.
@@ -192,8 +197,26 @@ class InvokeCallbackIfDetectedAction(StrictModel):
     type: Literal["invoke_callback_if_detected"]
 
 
+class ApplyClearanceCookieAction(StrictModel):
+    """Apply the ``cf_clearance`` cookie returned by Cloudflare Challenge.
+
+    Reads the structured token returned by
+    ``CaptchaAIClient.submit_cloudflare_challenge`` (a JSON object with
+    ``cookies`` + ``userAgent``), sets the cookie on the browser context,
+    and updates the page's User-Agent so the cleared session matches the
+    fingerprint Cloudflare validated.
+    """
+
+    type: Literal["apply_clearance_cookie"]
+
+
 Action = Annotated[
-    FillAction | ClickAction | WaitAction | InjectTokenAction | InvokeCallbackIfDetectedAction,
+    FillAction
+    | ClickAction
+    | WaitAction
+    | InjectTokenAction
+    | InvokeCallbackIfDetectedAction
+    | ApplyClearanceCookieAction,
     Field(discriminator="type"),
 ]
 
@@ -237,6 +260,32 @@ class Failure(StrictModel):
         return v
 
 
+class Proxy(StrictModel):
+    """Outbound proxy used by both the CaptchaAI worker and the browser.
+
+    Required when ``captcha_type=cloudflare_challenge`` because the
+    ``cf_clearance`` cookie is bound to the IP that solved the
+    challenge — replaying it from a different egress will be rejected.
+
+    Credentials live ONLY in env vars; the YAML carries the variable
+    NAMES, never the secret. The runtime resolves them on use.
+    """
+
+    type: Literal["HTTP", "HTTPS", "SOCKS4", "SOCKS5"]
+    host: Annotated[str, Field(min_length=1, max_length=255)]
+    port: Annotated[int, Field(ge=1, le=65535)]
+    username_env: str | None = None
+    password_env: str | None = None
+
+    @model_validator(mode="after")
+    def _both_or_neither_creds(self) -> Proxy:
+        if (self.username_env is None) != (self.password_env is None):
+            raise ValueError(
+                "proxy.username_env and proxy.password_env must both be set or both omitted"
+            )
+        return self
+
+
 # ----------------------------------------------------------------------------
 # Top-level profile
 # ----------------------------------------------------------------------------
@@ -244,7 +293,7 @@ class Failure(StrictModel):
 
 class Profile(StrictModel):
     name: Annotated[str, Field(min_length=1, max_length=120, pattern=r"^[a-zA-Z0-9._\-]+$")]
-    captcha_type: Literal["turnstile", "recaptcha_v2", "recaptcha_v3"]
+    captcha_type: Literal["turnstile", "recaptcha_v2", "recaptcha_v3", "cloudflare_challenge"]
     target: Target
     browser: Browser = Field(default_factory=Browser)
     captchaai: CaptchaAIConfig = Field(default_factory=CaptchaAIConfig)
@@ -252,6 +301,17 @@ class Profile(StrictModel):
     actions: Actions = Field(default_factory=Actions)
     success: Success
     failure: Failure = Field(default_factory=Failure)
+    proxy: Proxy | None = None
+
+    @model_validator(mode="after")
+    def _proxy_required_for_cloudflare(self) -> Profile:
+        if self.captcha_type == "cloudflare_challenge" and self.proxy is None:
+            raise ValueError(
+                "captcha_type=cloudflare_challenge requires a `proxy` block: "
+                "the CaptchaAI worker must clear the challenge through the same "
+                "network egress your browser will replay the cookie from"
+            )
+        return self
 
 
 __all__ = [
@@ -259,6 +319,7 @@ __all__ = [
     "_SECRET_LIKE_PATTERN",
     "Action",
     "Actions",
+    "ApplyClearanceCookieAction",
     "Browser",
     "CaptchaAIConfig",
     "ClickAction",
@@ -268,6 +329,7 @@ __all__ = [
     "InjectTokenAction",
     "InvokeCallbackIfDetectedAction",
     "Profile",
+    "Proxy",
     "StrictModel",
     "Success",
     "Target",

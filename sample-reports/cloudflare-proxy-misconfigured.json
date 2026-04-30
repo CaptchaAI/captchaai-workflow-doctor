@@ -1,0 +1,18 @@
+{
+  "action_steps": [],
+  "captcha_id_redacted": null,
+  "captcha_type": "cloudflare_challenge",
+  "detail": "cloudflare_challenge proxy credentials missing from environment: ['DOCTOR_PROXY_USER', 'DOCTOR_PROXY_PASS']",
+  "duration_seconds": 8.123,
+  "ended_at": "2026-04-30T21:00:08Z",
+  "poll_attempts": 0,
+  "poll_seconds": 0.0,
+  "profile_name": "local-demo-cloudflare-challenge",
+  "recommendation": "Profile uses captcha_type=cloudflare_challenge but the proxy block is missing or its credential env vars are unset. Cloudflare binds the cf_clearance cookie to the IP that solved it, so both the CaptchaAI worker and your browser must egress through the same proxy. Add a `proxy:` block and export the username/password env vars.",
+  "root_cause": "cloudflare_proxy_misconfigured",
+  "screenshots": [],
+  "sitekey_found": null,
+  "started_at": "2026-04-30T21:00:00Z",
+  "status": "failure",
+  "target_url": "http://127.0.0.1:8769/protected"
+}
