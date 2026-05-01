@@ -1,6 +1,6 @@
 # CaptchaAI Workflow Doctor
 
-> Status: **Beta** — `v0.2.0` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md), and [PROGRESS.md](PROGRESS.md).
+> Status: **Beta** — `v0.2.1` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md), and [PROGRESS.md](PROGRESS.md).
 >
 > 📖 **Read the guide:** [Why CAPTCHA Tokens Work in the API but Fail in the Browser](https://blog.captchaai.com/why-captcha-tokens-fail-in-browser) — the four token-handling constraints, with worked examples and a Python integration that satisfies all of them.
 
@@ -21,7 +21,7 @@ When the solver returns a token but your page still rejects the
 workflow, doctor walks the full pipeline against a real Chromium
 browser — submit → poll → inject → invoke callback → submit → verify —
 and tells you *exactly* where it broke. See
-[docs/failure-taxonomy.md](docs/failure-taxonomy.md) for the 12
+[docs/failure-taxonomy.md](docs/failure-taxonomy.md) for the 14
 possible root causes.
 
 Every run produces:

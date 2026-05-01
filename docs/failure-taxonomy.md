@@ -17,6 +17,8 @@ error short-circuits all subsequent stages).
 | `browser_action_failed` | A `before_solve` or `after_token` action errored (selector miss, timeout, navigation crash). | Inspect the screenshots + action timeline in the HTML report. |
 | `callback_not_invoked` | None of `detection.callback_candidates` were defined on the page when we tried to invoke them. | Check the actual JS — the callback name may have been renamed/minified, or the widget loaded async. |
 | `verification_failed` | Form submitted but the page showed the failure text / didn't show the success selector. | Wrong success/failure pattern in the profile, or the token was rejected by the server. |
+| `recaptcha_v3_action_missing` | Profile uses `captcha_type=recaptcha_v3` but `detection.action` is empty. | Set `detection.action` to the exact action name the page passes to `grecaptcha.execute` (e.g. `login`, `submit`). |
+| `cloudflare_proxy_misconfigured` | Profile uses `captcha_type=cloudflare_challenge` but the `proxy:` block is missing or its credential env vars are unset. | Add a `proxy:` block and export the username/password env vars — the `cf_clearance` cookie is bound to the egress IP that solved it. |
 | `unknown` | Catch-all (defensive). | Look at the report's `detail` field; file an issue with the screenshots. |
 
 ## How the classifier prioritizes

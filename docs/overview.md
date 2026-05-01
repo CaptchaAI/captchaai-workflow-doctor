@@ -30,7 +30,10 @@ action timeline, and a labeled root cause.
 
 ## Status
 
-- **`v0.2.0` (Beta)**: multi-CAPTCHA — Cloudflare Turnstile (managed
+- **`v0.2.1` (Beta)**: trust/packaging polish — NOTICE attribution,
+  ROADMAP/SUPPORT docs, issue templates, hero image and launch article
+  link in README.
+- **`v0.2.0`**: multi-CAPTCHA — Cloudflare Turnstile (managed
   and invisible), reCAPTCHA v2, reCAPTCHA v3, and Cloudflare
   Challenge. HTML + JSON reports, JSON Schema, real-solve evidence,
   CI mode, branch protection.
@@ -41,7 +44,7 @@ action timeline, and a labeled root cause.
 
 1. [Quickstart](../README.md#quickstart) — clone, install, run a demo.
 2. [Profile schema](profile-schema.md) — write your own profile.
-3. [Failure taxonomy](failure-taxonomy.md) — the 12 root-cause classes.
+3. [Failure taxonomy](failure-taxonomy.md) — the 14 root-cause classes.
 4. [Token lifecycle](token-lifecycle.md) — the four constraints every
    integration must satisfy.
 5. [CI integration](ci-integration.md) — how to wire doctor into your
