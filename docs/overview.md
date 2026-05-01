@@ -30,9 +30,12 @@ action timeline, and a labeled root cause.
 
 ## Status
 
-- **Phase 5 complete**: HTML + JSON reports, JSON Schema, real-solve
-  evidence, CI mode.
-- **Phase 6 in progress**: docs, polish, v0.1.0 release.
+- **`v0.2.0` (Beta)**: multi-CAPTCHA — Cloudflare Turnstile (managed
+  and invisible), reCAPTCHA v2, reCAPTCHA v3, and Cloudflare
+  Challenge. HTML + JSON reports, JSON Schema, real-solve evidence,
+  CI mode, branch protection.
+- See [CHANGELOG](../CHANGELOG.md) for the per-release detail and
+  [ROADMAP](../ROADMAP.md) for what's on deck.
 
 ## Where to start
 

@@ -1,0 +1,79 @@
+name: Bug report
+description: Something in the doctor is broken or behaves unexpectedly
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Please attach
+        the relevant artifacts so we can reproduce the issue quickly.
+
+        Account / billing / API-key issues are not doctor bugs — please
+        contact CaptchaAI support at support@captchaai.com.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of what you expected vs what you saw.
+      placeholder: I ran `captchaai-doctor run …` and the report said `…` but I expected `…`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Exact command you ran
+      render: bash
+      placeholder: |
+        captchaai-doctor run \
+          --profile profiles/my-flow.yaml \
+          --artifact-dir run-artifacts/ \
+          --ci --fail-on workflow
+    validations:
+      required: true
+
+  - type: textarea
+    id: report
+    attributes:
+      label: Redacted report.json
+      description: |
+        Attach the `report.json` produced by the failing run (drag-and-drop
+        the file or paste the contents). Make sure secrets are redacted —
+        see SUPPORT.md.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: profile
+    attributes:
+      label: Profile YAML (with private selectors removed if needed)
+      render: yaml
+    validations:
+      required: false
+
+  - type: input
+    id: doctor-version
+    attributes:
+      label: Doctor version
+      description: Output of `captchaai-doctor --version`
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: OS + Python version
+      placeholder: "Windows 11, Python 3.12.3"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: redaction-confirm
+    attributes:
+      label: Redaction confirmation
+      options:
+        - label: I have removed API keys, captcha ids, tokens, and any other secrets from the attached files.
+          required: true

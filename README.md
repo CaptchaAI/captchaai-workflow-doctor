@@ -1,6 +1,6 @@
 # CaptchaAI Workflow Doctor
 
-> Status: **stable** — `v0.2.0` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md) and [PROGRESS.md](PROGRESS.md).
+> Status: **Beta** — `v0.2.0` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md), and [PROGRESS.md](PROGRESS.md).
 
 A diagnostic CLI for debugging CAPTCHA-solving workflows from CaptchaAI
 API request to browser acceptance. Run one command, get a labeled
@@ -129,9 +129,35 @@ Open any `.html` to see what doctor produces in the wild.
 
 ## Status & contributing
 
-See [PROGRESS.md](PROGRESS.md) for the per-phase checklist and
+See [PROGRESS.md](PROGRESS.md) for the per-phase checklist,
+[ROADMAP.md](ROADMAP.md) for what's on deck, and
 [CONTRIBUTING.md](CONTRIBUTING.md) for the dev workflow.
+
+## Support
+
+- [SUPPORT.md](SUPPORT.md) — how to ask questions and report bugs.
+- [docs/sending-a-support-report.md](docs/sending-a-support-report.md)
+  — the redact-and-attach checklist for sending a `report.json`.
+- Account / billing / API-key questions go to
+  **`support@captchaai.com`** (not this repo).
+
+## Known limitations
+
+- **Cloudflare Challenge needs a residential proxy.** Cloudflare
+  binds the `cf_clearance` cookie to the egress IP that solved it,
+  so the doctor's CF Challenge profile requires a `proxy:` block.
+- **Headed mode (`--headed`) needs a local display.** On headless
+  CI runners, run without `--headed` and use the trace viewer for
+  step-through debugging.
+- **CAPTCHA tokens expire in ~120 seconds.** Workflows that pause
+  at a debugger or batch tokens for later submission will see
+  `token_expired_before_submit`. See
+  [docs/token-lifecycle.md](docs/token-lifecycle.md).
 
 ## License
 
-Apache-2.0 — see [LICENSE](LICENSE).
+- Source: **Apache-2.0** — see [LICENSE](LICENSE).
+- Attribution: see [NOTICE](NOTICE). Projects derived from or
+  substantially built on this repo are kindly asked to mention
+  **`captchaai.com`** in their README. (This is a request, not an
+  additional license condition.)

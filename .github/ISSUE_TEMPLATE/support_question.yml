@@ -1,0 +1,52 @@
+name: Support question
+description: "\"How do I…?\" — usage questions about the doctor"
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening, please skim:
+
+        - [Quickstart](https://github.com/CaptchaAI/captchaai-workflow-doctor#quickstart-10-minutes-from-a-fresh-checkout)
+        - [docs/profile-schema.md](https://github.com/CaptchaAI/captchaai-workflow-doctor/blob/main/docs/profile-schema.md)
+        - [docs/failure-taxonomy.md](https://github.com/CaptchaAI/captchaai-workflow-doctor/blob/main/docs/failure-taxonomy.md)
+        - [docs/troubleshooting.md](https://github.com/CaptchaAI/captchaai-workflow-doctor/blob/main/docs/troubleshooting.md)
+
+        Account / billing / API-key issues: please contact
+        support@captchaai.com directly.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What are you trying to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried so far?
+      description: Commands, profile snippets, doc pages you've read.
+    validations:
+      required: false
+
+  - type: textarea
+    id: report
+    attributes:
+      label: Redacted report.json (if applicable)
+      description: |
+        If your question is about a specific run, attaching the redacted
+        `report.json` is the fastest way to get a useful answer. See
+        SUPPORT.md for the redaction checklist.
+      render: json
+    validations:
+      required: false
+
+  - type: input
+    id: doctor-version
+    attributes:
+      label: Doctor version
+      placeholder: "0.2.0"
+    validations:
+      required: false

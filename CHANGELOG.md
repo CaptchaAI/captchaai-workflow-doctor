@@ -39,13 +39,16 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Notes
 
 - Live-solve verification: reCAPTCHA v2, reCAPTCHA v3, and Turnstile
-  (managed + invisible) all confirmed against `ocr.captchaai.com`.
-  Cloudflare Challenge is partially verified — the method name +
-  parameter contract are accepted live, but a full solve requires a
-  real residential proxy (Cloudflare binds the cookie to the worker's
-  egress IP); deferred until a proxy is plumbed in.
-- hCaptcha was probed and **not** offered by CaptchaAI; the slot was
-  taken by Cloudflare Challenge.
+  (managed + invisible) are all confirmed against `ocr.captchaai.com`.
+- Cloudflare Challenge ships with the verified submit contract and
+  the `cf_clearance` cookie / User-Agent replay path. Full live-solve
+  coverage requires a real residential proxy on the worker side
+  (Cloudflare binds the clearance cookie to the egress IP that solved
+  it); residential-proxy plumbing is on the roadmap and will land in
+  a follow-up release. See [`ROADMAP.md`](ROADMAP.md).
+- v0.2 supported types: Turnstile (managed + invisible), reCAPTCHA
+  v2, reCAPTCHA v3, and Cloudflare Challenge. Additional types may
+  be added in future minor releases.
 
 ## [0.1.0] — 2026-04-29
 

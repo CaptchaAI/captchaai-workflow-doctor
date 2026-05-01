@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest a new capability, profile shape, or root cause
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. The more specific the integration
+        scenario, the easier it is to scope.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: |
+        Describe the workflow you're trying to debug or the gap you're hitting
+        today. Real examples (with anything sensitive redacted) help a lot.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would the feature look like?
+      description: |
+        CLI flag? Profile field? New root cause? New report section?
+        A rough sketch is fine.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Workarounds you tried, or other tools that solve a similar problem.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Rough scope guess
+      options:
+        - Small (CLI flag / new field on an existing schema)
+        - Medium (new profile feature / new root cause class)
+        - Large (new CAPTCHA type / new browser engine / new SDK)
+    validations:
+      required: false

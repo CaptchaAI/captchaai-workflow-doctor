@@ -12,7 +12,7 @@ license = { text = "Apache-2.0" }
 authors = [{ name = "CaptchaAI" }]
 keywords = ["captcha", "captchaai", "playwright", "diagnostic", "turnstile", "recaptcha"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3",
@@ -54,6 +54,30 @@ Issues = "https://github.com/CaptchaAI/captchaai-workflow-doctor/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["captchaai_doctor"]
+force-include = { "NOTICE" = "captchaai_doctor/NOTICE" }
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "captchaai_doctor/**",
+  "profiles/**",
+  "demos/**",
+  "docs/**",
+  "sample-reports/**",
+  "scripts/**",
+  "tests/**",
+  "README.md",
+  "CHANGELOG.md",
+  "ROADMAP.md",
+  "SUPPORT.md",
+  "CONTRIBUTING.md",
+  "SECURITY.md",
+  "LICENSE",
+  "NOTICE",
+  "PROGRESS.md",
+  "pyproject.toml",
+  "ruff.toml",
+  "mypy.ini",
+]
 
 [tool.pytest.ini_options]
 minversion = "8.0"

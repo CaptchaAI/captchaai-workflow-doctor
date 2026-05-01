@@ -1,10 +1,9 @@
-"""Failure classifier — full implementation lands in Phase 5.
+"""Failure classifier.
 
-This module exists today as a thin recommendation map so the report
-writer can already include "what to do next" text alongside each
-:class:`~captchaai_doctor.runner.RootCause`. Phase 5 will add
-confidence scoring, evidence aggregation, and unknown-failure
-heuristics.
+Maps each :class:`~captchaai_doctor.runner.RootCause` to a
+user-facing recommendation string. The report writer surfaces the
+recommendation in both the JSON and HTML report so users see
+"what to do next" alongside the labeled root cause.
 """
 
 from __future__ import annotations
