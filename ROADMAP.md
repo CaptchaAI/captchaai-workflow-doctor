@@ -11,6 +11,9 @@ For the per-release detail see [CHANGELOG.md](CHANGELOG.md).
 
 ## Recently shipped
 
+- **`v0.2.1`** — Trust/packaging polish: NOTICE attribution,
+  ROADMAP/SUPPORT docs, GitHub issue templates, README hero image,
+  live launch article link, Phase 10–15 epic issues.
 - **`v0.2.0`** — Multi-CAPTCHA support: Cloudflare Turnstile (managed
   + invisible), reCAPTCHA v2, reCAPTCHA v3, and Cloudflare Challenge.
   Sample reports, demos, and live-solve coverage for the
@@ -52,9 +55,6 @@ For the per-release detail see [CHANGELOG.md](CHANGELOG.md).
   schema is stable.
 - **Headed observability + VS Code extension** ([#26](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/26))
   — `--pause-on-failure`, live TUI, profile YAML language server.
-
-## Considering
-
 - **Additional widget heuristics** — broader coverage of the long
   tail of CAPTCHA widget shapes seen in the wild (custom
   integrations, SPA-loaded widgets, shadow-DOM hosted widgets).
