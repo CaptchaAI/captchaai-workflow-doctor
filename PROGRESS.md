@@ -13,10 +13,10 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] Quarantine `creds.txt` → `.secrets/creds.txt`
 - [x] `.gitignore` excludes secrets and runtime artifacts
 - [x] `.env.example` with placeholder names
-- [ ] Initial commit on `main` (skeleton only — no secrets)
-- [ ] Push to private `CaptchaAI/captchaai-workflow-doctor`
-- [ ] Branch protection on `main` (require PR + CI green, no force-push)
-- [ ] Test server: create non-root `doctor` user, install deploy key (host in `.secrets/`)
+- [x] Initial commit on `main` (skeleton only — no secrets)
+- [x] Push to `CaptchaAI/captchaai-workflow-doctor` (private at first; flipped public 2026-05-01)
+- [x] Branch protection on `main` (require PR + CI green, no force-push) — ruleset id `15822965` (see Phase 8)
+- [N/A] Test server: create non-root `doctor` user, install deploy key (host in `.secrets/`) — *not needed: live-solve tests run against the public CaptchaAI API directly from local + CI; no dedicated VPS was provisioned. `scripts/provision-server.sh` skeleton kept for future use.*
 
 ## Phase 0 — Repo skeleton
 
@@ -27,8 +27,8 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `tests/` with smoke tests
 - [x] `.github/workflows/ci.yml` (lint + type + test + gitleaks)
 - [x] `README.md`, `PROGRESS.md`
-- [ ] CI green on first push
-- [ ] **Checkpoint: user review**
+- [x] CI green on first push
+- [x] **Checkpoint: user review**
 
 ## Phase 1 — Profile system + Pydantic schemas
 
@@ -41,7 +41,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] Tests: valid profiles pass; each rule violation fails with actionable message
 - [x] Tests: secret-shaped strings in YAML rejected
 - [x] `docs/profile-schema.md`
-- [ ] **Checkpoint**
+- [x] **Checkpoint**
 
 ## Phase 2 — CaptchaAI client + poller (mocked)
 
