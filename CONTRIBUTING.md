@@ -1,9 +1,8 @@
 # Contributing
 
 Thanks for considering a contribution. This project is small and
-opinionated — please skim this file and the
-[plan](INTERNAL-STRATEGY/captchaai_workflow_doctor_full_plan.md) before
-opening a PR.
+opinionated — please skim this file and [PROGRESS.md](PROGRESS.md)
+before opening a PR.
 
 ## Local setup
 

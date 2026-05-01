@@ -5,6 +5,13 @@
 .env.*
 !.env.example
 
+# --- Internal / private notes (NEVER commit) ---
+INTERNAL-STRATEGY/
+INTERNAL/
+PRIVATE/
+NOTES.private.md
+*.private.md
+
 # --- Runtime artifacts ---
 run-artifacts/
 .playwright/

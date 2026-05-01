@@ -1,6 +1,6 @@
 # CaptchaAI Workflow Doctor
 
-> Status: **beta** — feature-complete for v0.1.0, see [PROGRESS.md](PROGRESS.md).
+> Status: **stable** — `v0.2.0` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md) and [PROGRESS.md](PROGRESS.md).
 
 A diagnostic CLI for debugging CAPTCHA-solving workflows from CaptchaAI
 API request to browser acceptance. Run one command, get a labeled
@@ -48,7 +48,10 @@ captchaai-doctor --help
 
 ```bash
 captchaai-doctor demo turnstile
+captchaai-doctor demo turnstile-invisible
 captchaai-doctor demo recaptcha-v2
+captchaai-doctor demo recaptcha-v3
+captchaai-doctor demo cloudflare-challenge
 ```
 
 Each spins up a local Flask app, drives it through the full pipeline
@@ -77,12 +80,28 @@ captchaai-doctor run \
 - [Troubleshooting](docs/troubleshooting.md) — common gotchas
 - [Real-API evidence log](docs/real-e2e-evidence.md)
 
+## Supported CAPTCHA types
+
+| Type                  | Submit method (CaptchaAI)            | Demo command                                  |
+| --------------------- | ------------------------------------ | --------------------------------------------- |
+| Cloudflare Turnstile  | `turnstile`                          | `demo turnstile` / `demo turnstile-invisible` |
+| reCAPTCHA v2          | `userrecaptcha`                      | `demo recaptcha-v2`                           |
+| reCAPTCHA v3          | `userrecaptcha` (v3, action+score)   | `demo recaptcha-v3`                           |
+| Cloudflare Challenge  | `cloudflare_challenge` (proxy req'd) | `demo cloudflare-challenge`                   |
+
+See [docs/profile-schema.md](docs/profile-schema.md) for the per-type
+profile fields. Cloudflare Challenge requires a `proxy:` block because
+the `cf_clearance` cookie is bound to the egress IP that solved it.
+
 ## CLI
 
 ```text
-captchaai-doctor run             # run a profile end-to-end
-captchaai-doctor demo turnstile  # bundled Turnstile mock + driver
+captchaai-doctor run                       # run a profile end-to-end
+captchaai-doctor demo turnstile            # bundled Turnstile mock + driver
+captchaai-doctor demo turnstile-invisible
 captchaai-doctor demo recaptcha-v2
+captchaai-doctor demo recaptcha-v3
+captchaai-doctor demo cloudflare-challenge
 captchaai-doctor validate-profile <path>
 captchaai-doctor schema [--output path]
 ```
@@ -92,14 +111,19 @@ Exit codes follow [docs/ci-integration.md](docs/ci-integration.md):
 
 ## Sample reports
 
-`sample-reports/` contains five fixtures rendered by
+`sample-reports/` contains ten fixtures rendered by
 `scripts/regenerate_sample_reports.py`:
 
-- `success` — happy path
+- `success` — happy path (Turnstile)
 - `verification-failed`
 - `callback-not-invoked`
 - `sitekey-not-found`
 - `captchaai-balance`
+- `turnstile-invisible-success`
+- `recaptcha-v3-success`
+- `recaptcha-v3-action-missing`
+- `cloudflare-challenge-success`
+- `cloudflare-proxy-misconfigured`
 
 Open any `.html` to see what doctor produces in the wild.
 

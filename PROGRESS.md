@@ -3,8 +3,8 @@
 Single source of truth for "what's done vs pending". Updated in the same commit as the work.
 Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
-> See `INTERNAL-STRATEGY/captchaai_workflow_doctor_full_plan.md` for the full strategy
-> and `/memories/session/plan.md` for the agent execution plan.
+> Internal strategy and execution notes are kept private (outside the repo).
+> Public consumers should treat this file + the docs under `docs/` as the source of truth.
 
 ---
 
@@ -101,7 +101,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `docs/` filled per plan §7 (overview, responsible-use, failure-taxonomy, token-lifecycle, profile-schema, report-schema, ci-integration, troubleshooting, architecture, real-e2e-evidence)
 - [x] README quickstart walkthrough <10 min on fresh VM
 - [x] CONTRIBUTING.md
-- [x] Flagship article draft → `INTERNAL-STRATEGY/article-draft.md`
+- [x] Flagship article draft (kept privately, outside the repo)
 - [x] `ruff check`, `mypy --strict`, full `pytest` all green
 - [x] All plan §25 acceptance criteria checked
 - [x] Tag `v0.1.0`, draft release notes
