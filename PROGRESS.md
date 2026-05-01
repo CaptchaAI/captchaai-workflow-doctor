@@ -105,7 +105,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `ruff check`, `mypy --strict`, full `pytest` all green
 - [x] All plan §25 acceptance criteria checked
 - [x] Tag `v0.1.0`, draft release notes
-- [ ] Flip repo public *(USER ACTION)*
+- [x] Flip repo public
 
 ---
 
@@ -185,10 +185,12 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] `.github/CODEOWNERS` (assigns @bshahin)
 - [x] `.github/PULL_REQUEST_TEMPLATE.md` (verification checklist)
 - [x] Ready-to-apply ruleset: `.github/rulesets/protect-main.json` (+ README)
-- [ ] Apply ruleset *(blocked: GitHub free private repos cannot enable branch protection or rulesets — apply right after the user flips the repo public)*
-- [ ] Verify `git push --dry-run --force origin main` is rejected (post-public)
+- [x] Apply ruleset (active on `main`, ruleset id `15822965`, 2026-05-01)
+- [x] Verify force-push / direct push to `main` is rejected (PR-only, required checks: lint-type-test 3.11 + 3.12, demo-smoke, secrets-scan)
 
 ## Release v0.2.0
 
-- [ ] Tag `v0.2.0`
-- [ ] GitHub release notes (reCAPTCHA v3 + Turnstile invisible + Cloudflare Challenge + branch protection scaffolding)
+- [x] Tag `v0.2.0`
+- [x] GitHub release notes (reCAPTCHA v3 + Turnstile invisible + Cloudflare Challenge + branch protection scaffolding)
+- [x] Repo flipped public (2026-05-01)
+- [x] Branch protection ruleset applied
