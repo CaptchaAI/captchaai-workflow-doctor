@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: CaptchaAI account / billing / API-key support
+    url: https://captchaai.com
+    about: Account, billing, or API-key issues are handled by CaptchaAI support, not via this repo.
+  - name: Discussions
+    url: https://github.com/CaptchaAI/captchaai-workflow-doctor/discussions
+    about: For open-ended usage questions and integration design chats.

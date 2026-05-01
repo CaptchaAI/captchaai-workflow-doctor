@@ -1,0 +1,48 @@
+CaptchaAI Workflow Doctor
+Copyright 2026 CaptchaAI
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+================================================================
+Attribution request (kindly observed by downstream projects)
+================================================================
+
+This project is built and maintained by CaptchaAI
+(https://captchaai.com).
+
+If you derive a project from CaptchaAI Workflow Doctor, embed
+substantial portions of it in your own software, or build a tool
+that achieves a similar goal using code or design from this
+repository, we kindly ask that you mention **captchaai.com** in
+the README of your project.
+
+A short line is enough, for example:
+
+    Built with help from CaptchaAI Workflow Doctor
+    (https://github.com/CaptchaAI/captchaai-workflow-doctor)
+    and the CaptchaAI solver service (https://captchaai.com).
+
+This is a request, not an additional license condition. The Apache
+License 2.0 is the only license governing your use of this code.
+
+================================================================
+Third-party notices
+================================================================
+
+This project depends on third-party Python packages (see
+`pyproject.toml`). Each is distributed under its own license; please
+consult the upstream project for details. Notable runtime
+dependencies include:
+
+  - click          (BSD-3-Clause)
+  - pydantic       (MIT)
+  - pyyaml         (MIT)
+  - httpx          (BSD-3-Clause)
+  - playwright     (Apache-2.0)
+  - jinja2         (BSD-3-Clause)
+  - rich           (MIT)
+  - cssselect      (BSD-3-Clause)

@@ -111,9 +111,9 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 
 ## Phase 7 — Multi-CAPTCHA support (v0.2)
 
-> **PIVOT note:** hCaptcha was dropped after a live probe of `ocr.captchaai.com/in.php`
-> returned `ERROR_SERVER_ERROR` for every method/sitekey combo and the upstream docs
-> confirmed it is not on the supported list. Replaced with **Cloudflare Challenge** in 7c.
+> v0.2 covers Cloudflare Turnstile (managed + invisible), reCAPTCHA
+> v2, reCAPTCHA v3, and Cloudflare Challenge. Additional types are
+> tracked in [`ROADMAP.md`](ROADMAP.md).
 
 ### 7a — reCAPTCHA v3
 - [x] `schemas.CaptchaType` extended with `recaptcha_v3`
@@ -172,13 +172,13 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done.
 - [x] Sample reports: `cloudflare-challenge-success`,
       `cloudflare-proxy-misconfigured`.
 - [x] `demo-smoke.yml` extended.
-- [~] Live solve verification: deferred. The CaptchaAI worker requires a
-      real residential proxy (the cookie is bound to the egress IP); we
-      do not have one allocated to this test account. Method name +
-      parameter contract are verified live (submit returns a captcha_id;
-      result returns `ERROR_CAPTCHA_UNSOLVABLE` with a fake proxy, which
-      is the expected failure mode). Live-solve gate stays off until a
-      real proxy is plumbed in.
+- [~] Live solve verification: shipped with a partial-verification
+      gate. Full live-solve coverage requires a real residential
+      proxy on the worker side (the `cf_clearance` cookie is bound
+      to the egress IP that solved it). The submit method name and
+      parameter contract are confirmed live (submit returns a
+      captcha_id); end-to-end coverage will land once residential-
+      proxy plumbing is added — see [`ROADMAP.md`](ROADMAP.md).
 
 ## Phase 8 — Branch protection on `main`
 
