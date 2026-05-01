@@ -1,6 +1,10 @@
 # CaptchaAI Workflow Doctor
 
 > Status: **Beta** — `v0.2.0` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md), and [PROGRESS.md](PROGRESS.md).
+>
+> 📖 **Read the guide:** [Why CAPTCHA Tokens Work in the API but Fail in the Browser](https://blog.captchaai.com/why-captcha-tokens-fail-in-browser) — the four token-handling constraints, with worked examples and a Python integration that satisfies all of them.
+
+![CaptchaAI Workflow Doctor](docs/assets/hero.png)
 
 A diagnostic CLI for debugging CAPTCHA-solving workflows from CaptchaAI
 API request to browser acceptance. Run one command, get a labeled
