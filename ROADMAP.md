@@ -21,27 +21,40 @@ For the per-release detail see [CHANGELOG.md](CHANGELOG.md).
 
 ## On deck
 
-- **Cloudflare Challenge live-solve coverage** — wire residential
-  proxy support so the existing CF Challenge code path can be
-  end-to-end live-tested. Cloudflare binds the `cf_clearance` cookie
-  to the egress IP, so this needs a stable residential proxy on the
-  worker side; the doctor side is already wired (`Proxy` schema +
-  `ApplyClearanceCookieAction`).
-- **Profile cookbook** (`docs/cookbook/`) — a small set of worked,
-  anonymized real-world profiles (login, checkout, contact form,
-  multi-step) showing how to translate a real workflow into YAML.
+- **Cloudflare Challenge live-solve coverage** ([#21](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/21))
+  — wire residential proxy support so the existing CF Challenge
+  code path can be end-to-end live-tested. Cloudflare binds the
+  `cf_clearance` cookie to the egress IP, so this needs a stable
+  residential proxy on the worker side; the doctor side is already
+  wired (`Proxy` schema + `ApplyClearanceCookieAction`).
+- **Failure taxonomy expansion** ([#22](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/22))
+  — surface 7 additional `root_cause` classes (`pageurl_mismatch`,
+  `wrong_frame`, `submitted_before_injection`,
+  `iframe_blocked`, `widget_loaded_but_no_sitekey`,
+  `multi_widget_ambiguity`, `success_then_revert`) with detection
+  hooks, sample reports, and recommendation strings.
+- **Profile cookbook + scaffolder** ([#23](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/23))
+  — `cookbook/` of curated anonymized profiles plus
+  `doctor scaffold --from cookbook:<id>` and an interactive
+  `doctor init` wizard.
+- **Report intelligence** ([#24](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/24))
+  — `report.diff`, `report.aggregate`, interactive HTML timeline,
+  Slack/webhook output, Prometheus exporter.
 - **Headed-mode trace viewer helper** — a small CLI command to open
   the most recent run's Playwright trace without remembering the
   Playwright trace-viewer invocation.
-- **Expanded sample reports** — one per root cause in
-  `docs/failure-taxonomy.md`, so you can see what each failure looks
-  like before you hit it.
 
 ## Considering
 
-- **Node SDK parity** — a TypeScript package mirroring the Python
-  CLI / runner / report contract. Only after Python adoption is
-  firmly established and the schema is stable.
+- **Node SDK parity** ([#25](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/25))
+  — a TypeScript package mirroring the Python CLI / runner / report
+  contract. Only after Python adoption is firmly established and the
+  schema is stable.
+- **Headed observability + VS Code extension** ([#26](https://github.com/CaptchaAI/captchaai-workflow-doctor/issues/26))
+  — `--pause-on-failure`, live TUI, profile YAML language server.
+
+## Considering
+
 - **Additional widget heuristics** — broader coverage of the long
   tail of CAPTCHA widget shapes seen in the wild (custom
   integrations, SPA-loaded widgets, shadow-DOM hosted widgets).
