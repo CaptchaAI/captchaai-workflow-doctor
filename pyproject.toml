@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "captchaai-workflow-doctor"
-version = "0.2.0"
+version = "0.2.1"
 description = "Diagnostic CLI for debugging CAPTCHA-solving workflows from CaptchaAI API request to browser acceptance."
 readme = "README.md"
 requires-python = ">=3.11"

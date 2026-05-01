@@ -5,6 +5,39 @@ All notable changes to **captchaai-workflow-doctor** are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] — 2026-05-01
+
+### Added
+
+- `NOTICE` file with a soft attribution request asking downstream
+  projects to mention `captchaai.com`. Apache-2.0 license unchanged.
+- `ROADMAP.md` and `SUPPORT.md` at the repo root.
+- `docs/sending-a-support-report.md` walks users through producing a
+  redacted report for support tickets.
+- `scripts/capture-report-screenshot.py` — a Playwright @2× helper to
+  produce report screenshots for docs and the launch article.
+- README hero image and a link to the live launch article
+  (*Why CAPTCHA Tokens Work in the API but Fail in the Browser*).
+- GitHub issue templates (bug, feature, support) + contact-link config.
+
+### Changed
+
+- README status label is now **Beta** (was "stable"); `pyproject.toml`
+  classifier is now `Development Status :: 4 - Beta`. Honest given the
+  one-minor-release track record and the residential-proxy gap on the
+  Cloudflare Challenge live-solve path (tracked in `ROADMAP.md`).
+- Phase-internal phrasing in `CHANGELOG.md`, `PROGRESS.md`, and
+  `docs/real-e2e-evidence.md` rewritten to neutral scope language so
+  the public surface no longer reads as a release post-mortem.
+- `pyproject.toml` wheel build now `force-include`s `NOTICE` at
+  `captchaai_doctor/NOTICE`; sdist `include` lists `NOTICE`,
+  `ROADMAP.md`, and `SUPPORT.md` explicitly.
+
+### Notes
+
+- No runtime behavior changes. Pure trust / packaging / docs release.
+  Safe to upgrade from `0.2.0` with no profile or CLI changes.
+
 ## [0.2.0] — 2026-05-01
 
 ### Added — multi-CAPTCHA-type expansion
