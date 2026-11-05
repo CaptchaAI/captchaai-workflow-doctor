@@ -1,6 +1,13 @@
 # CaptchaAI Workflow Doctor
 
-> Status: **Beta** — `v0.2.1` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md), and [PROGRESS.md](PROGRESS.md).
+<p align="left">
+  <a href="https://pypi.org/project/captchaai-workflow-doctor/"><img src="https://img.shields.io/pypi/v/captchaai-workflow-doctor?label=PyPI&logo=pypi" alt="PyPI" /></a>
+  <a href="https://github.com/CaptchaAI/captchaai-workflow-doctor/releases"><img src="https://img.shields.io/github/v/release/CaptchaAI/captchaai-workflow-doctor?label=Release" alt="GitHub Release" /></a>
+  <a href="https://docs.captchaai.com/"><img src="https://img.shields.io/badge/Docs-docs.captchaai.com-blue" alt="Documentation" /></a>
+  <a href="https://github.com/CaptchaAI/captchaai-workflow-doctor/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License" /></a>
+</p>
+
+> Status: **Beta** — `v0.2.2` released (multi-CAPTCHA: Turnstile, reCAPTCHA v2/v3, Cloudflare Challenge). See [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md), and [PROGRESS.md](PROGRESS.md).
 >
 > 📖 **Read the guide:** [Why CAPTCHA Tokens Work in the API but Fail in the Browser](https://blog.captchaai.com/why-captcha-tokens-fail-in-browser) — the four token-handling constraints, with worked examples and a Python integration that satisfies all of them.
 
@@ -36,7 +43,23 @@ Doctor is for systems you own, operate, or are explicitly authorized to
 test. It is not for bypassing third-party CAPTCHAs. See
 [docs/responsible-use.md](docs/responsible-use.md).
 
-## Quickstart (10 minutes from a fresh checkout)
+## Packages
+
+- **PyPI Package (`captchaai-workflow-doctor`):** [https://pypi.org/project/captchaai-workflow-doctor/](https://pypi.org/project/captchaai-workflow-doctor/) (`pip install captchaai-workflow-doctor`)
+- **Official Python SDK (`captchaai`):** [https://pypi.org/project/captchaai/](https://pypi.org/project/captchaai/) (`pip install captchaai`)
+- **GitHub Releases:** [https://github.com/CaptchaAI/captchaai-workflow-doctor/releases](https://github.com/CaptchaAI/captchaai-workflow-doctor/releases)
+
+## Installation & Quickstart
+
+### Install from PyPI (recommended)
+
+```bash
+pip install captchaai-workflow-doctor
+python -m playwright install chromium
+captchaai-doctor --help
+```
+
+### Install from source (development & local checkout)
 
 ```bash
 git clone https://github.com/CaptchaAI/captchaai-workflow-doctor.git
