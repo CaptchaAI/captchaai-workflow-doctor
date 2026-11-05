@@ -4,20 +4,36 @@ build-backend = "hatchling.build"
 
 [project]
 name = "captchaai-workflow-doctor"
-version = "0.2.1"
+version = "0.2.2"
 description = "Diagnostic CLI for debugging CAPTCHA-solving workflows from CaptchaAI API request to browser acceptance."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
-authors = [{ name = "CaptchaAI" }]
-keywords = ["captcha", "captchaai", "playwright", "diagnostic", "turnstile", "recaptcha"]
+authors = [{ name = "CaptchaAI", email = "dev@captchaai.com" }]
+keywords = [
+  "captcha",
+  "captchaai",
+  "captcha-solver",
+  "playwright",
+  "diagnostic",
+  "diagnostics",
+  "troubleshooting",
+  "cli",
+  "turnstile",
+  "cloudflare-turnstile",
+  "recaptcha",
+  "web-scraping",
+  "automation",
+]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Topic :: Internet :: WWW/HTTP",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
 ]
@@ -49,7 +65,9 @@ dev = [
 captchaai-doctor = "captchaai_doctor.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/CaptchaAI/captchaai-workflow-doctor"
+Homepage = "https://captchaai.com/"
+Documentation = "https://docs.captchaai.com/"
+Repository = "https://github.com/CaptchaAI/captchaai-workflow-doctor"
 Issues = "https://github.com/CaptchaAI/captchaai-workflow-doctor/issues"
 
 [tool.hatch.build.targets.wheel]
